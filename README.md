@@ -67,15 +67,19 @@ flux-system ─▶ infrastructure/controllers ─▶ infrastructure/configs ─�
 
 ### 1. Talos Linux
 
-```bash
+```powershell
+# Generate common config
+# With VIP: 192.168.178.10
+talosctl gen config beehive https://192.168.178.10:6443 --with-secrets './talos/secrets.yaml' --config-patch '@./talos/common.patches.yaml' --config-patch-control-plane '@./talos/vip.yaml' --output ./talos/rendered/
+
 # Apply machine config to node
-talosctl apply-config --insecure --nodes <NODE_IP> --file talos/clusterconfig/<NODE_NAME>.yaml
+talosctl apply-config --insecure --nodes <NODE_IP> --file talos/rendered/controlplane.yaml --config-patch '@./talos/queen-and-bee-01.yaml'
 
 # Bootstrap etcd and Kubernetes
-talosctl bootstrap --nodes <NODE_IP>
+talosctl bootstrap --talosconfig talos/rendered/talosconfig --nodes <NODE_IP>
 
 # Retrieve kubeconfig
-talosctl kubeconfig --nodes <NODE_IP> --endpoints <NODE_IP>
+talosctl kubeconfig --talosconfig talos/rendered/talosconfig --nodes <NODE_IP> --endpoints <NODE_IP>
 
 # Verify
 kubectl get nodes
