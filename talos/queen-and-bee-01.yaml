@@ -1,0 +1,30 @@
+machine:
+  network:
+    hostname: queen-and-bee-01
+    interfaces:
+      - deviceSelector:
+          physical: true
+      # Assigns static IP addresses to the interface.
+        addresses:
+          - fd00::11/16
+          - 192.168.178.11/24
+
+  install:
+    disk: /dev/sdb
+
+  # Configures the node labels for the machine.
+  nodeLabels:
+    beehive.lan64.de/model: Wyse-5070
+    beehive.lan64.de/cpu: Pentium-J5005
+    beehive.lan64.de/memory: 16GB
+    beehive.lan64.de/storage: 256GB
+
+  kubelet:
+    extraMounts:
+      - destination: /var/mnt/local-path-provisioner
+        type: bind
+        source: /var/mnt/local-path-provisioner
+        options:
+          - bind
+          - rshared
+          - rw
