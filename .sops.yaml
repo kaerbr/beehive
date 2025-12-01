@@ -1,0 +1,13 @@
+creation_rules:
+  # Generic Kubernetes Secrets
+  - path_regex: .*\.secret(\.sops)?\.yaml
+    encrypted_regex: "^(data|stringData)$"
+    key_groups:
+      - age:
+          - age1ycyh0u3pvt39sucsd3jznl6ut4a4qz09f6wruqrl2565ddwhpd5qhrglw7
+  # Talos secret
+  - path_regex: talos\\secrets(\.sops)?\.yaml$
+    encrypted_regex: '^(id|secret|bootstraptoken|secretboxencryptionsecret|token|crt|key)$'
+    key_groups:
+      - age:
+          - age1ycyh0u3pvt39sucsd3jznl6ut4a4qz09f6wruqrl2565ddwhpd5qhrglw7
