@@ -1,0 +1,8 @@
+{
+    "recommendations": [
+        "editorconfig.editorconfig",
+        "eamodio.gitlens",
+        "ms-kubernetes-tools.vscode-kubernetes-tools",
+        "redhat.vscode-yaml"
+    ]
+}
