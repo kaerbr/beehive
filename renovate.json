@@ -4,5 +4,6 @@
         "config:best-practices",
         ":disableDependencyDashboard",
         "schedule:daily"
-    ]
+    ],
+    "assignees": ["kaerbr"]
 }
