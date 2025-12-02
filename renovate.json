@@ -2,8 +2,10 @@
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
     "extends": [
         "config:best-practices",
-        ":disableDependencyDashboard",
-        "schedule:daily"
+        ":disableDependencyDashboard"
     ],
-    "assignees": ["kaerbr"]
+    "assignees": ["kaerbr"],
+    "kubernetes": {
+        "managerFilePatterns": ["(^|/)kubernetes/.+\\.ya?ml$"]
+    }
 }
