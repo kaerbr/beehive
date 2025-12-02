@@ -3,8 +3,12 @@
     "extends": [
         "config:best-practices"
     ],
-    "assignees": ["kaerbr"],
+    "assignees": [
+        "kaerbr"
+    ],
     "kubernetes": {
-        "fileMatch": ["(^|/)kubernetes/apps/.+\\.ya?ml$"]
+        "managerFilePatterns": [
+            "/(^|/)kubernetes/apps/.+\\.ya?ml$/"
+        ]
     }
 }
