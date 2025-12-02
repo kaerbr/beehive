@@ -5,6 +5,6 @@
     ],
     "assignees": ["kaerbr"],
     "kubernetes": {
-        "managerFilePatterns": ["(^|/)kubernetes/.+\\.ya?ml$"]
+        "managerFilePatterns": ["(^|/)kubernetes/apps/.+\\.ya?ml$"]
     }
 }
