@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: podinfo
-          image: ghcr.io/stefanprodan/podinfo:6.9.0
+          image: ghcr.io/stefanprodan/podinfo:6.9.0@sha256:10af81c9659824cecaa7fe09134c6c318136341b4ae84c4a37f18d9bd8a33eac
           ports:
             - containerPort: 9898
               name: http
