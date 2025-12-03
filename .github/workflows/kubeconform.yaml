@@ -1,0 +1,11 @@
+name: kubeconform
+on: push
+jobs:
+  kubeconform:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: docker://ghcr.io/yannh/kubeconform:latest
+        with:
+          entrypoint: /kubeconform
+          args: "-ignore-filename-pattern .*kustomization\\.yaml -summary -output json kubernetes/apps/"
