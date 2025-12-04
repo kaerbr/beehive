@@ -1,0 +1,10 @@
+namespace: traefik
+resources:
+  - namespace.yaml
+  - helm.yaml
+configMapGenerator:
+  - name: traefik-helm-values
+    files:
+      - values.yaml
+generatorOptions:
+  disableNameSuffixHash: true
