@@ -88,9 +88,6 @@ kubectl get nodes
 ### 2. Flux CD
 
 ```bash
-# Set GitHub token
-export GITHUB_TOKEN=<your-token>
-
 # Bootstrap Flux
 flux bootstrap github \
   --owner=<GITHUB_USERNAME> \
