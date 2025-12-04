@@ -1,0 +1,42 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/alpine
+{
+	"name": "Alpine",
+	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+	// "image": "mcr.microsoft.com/devcontainers/base:alpine-3.21",
+	// "features": {
+	// 	"ghcr.io/rio/features/kustomize:1": {},
+	// 	"ghcr.io/devcontainers-extra/features/age:1": {},
+	// 	"ghcr.io/devcontainers-extra/features/sops:1": {}
+	// },
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"EditorConfig.EditorConfig",
+				"eamodio.gitlens",
+				"redhat.vscode-yaml"
+			]
+		}
+	},
+  "mounts": [
+    "source=${localEnv:USERPROFILE}/.config/sops/age/keys.txt,target=/home/vscode/.config/sops/age/keys.txt,readonly,type=bind"
+  ]
+
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	// "features": {},
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [],
+
+	// Use 'postCreateCommand' to run commands after the container is created.
+	// "postCreateCommand": "uname -a",
+
+	// Configure tool-specific properties.
+	// "customizations": {},
+
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "root"
+}

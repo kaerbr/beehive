@@ -1,0 +1,67 @@
+name: Update Versions
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+  schedule:
+    # Run weekly on Monday at 00:00 UTC
+    - cron: '0 0 * * 1'
+
+jobs:
+  update-versions:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get latest Talos version
+        id: talos
+        run: |
+          TALOS_VERSION=$(curl -sL https://api.github.com/repos/siderolabs/talos/releases/latest | jq -r '.tag_name')
+          echo "version=${TALOS_VERSION}" >> $GITHUB_OUTPUT
+          echo "Latest Talos version: ${TALOS_VERSION}"
+
+      - name: Get installed Flux version
+        id: flux
+        run: |
+          FLUX_VERSION=$(grep -m 1 "# Flux Version:" kubernetes/flux/config/flux-system/gotk-components.yaml | sed -E 's/.*: (v[0-9]+\.[0-9]+\.[0-9]+).*/\1/')
+          echo "version=${FLUX_VERSION}" >> $GITHUB_OUTPUT
+          echo "Installed Flux version: ${FLUX_VERSION}"
+
+      - name: Update README badges
+        run: |
+          TALOS_VERSION="${{ steps.talos.outputs.version }}"
+          FLUX_VERSION="${{ steps.flux.outputs.version }}"
+
+          # Remove 'v' prefix if present for cleaner badge display
+          TALOS_VERSION_CLEAN="${TALOS_VERSION#v}"
+          FLUX_VERSION_CLEAN="${FLUX_VERSION#v}"
+
+          # Update Talos badge (handles both with and without existing version)
+          sed -i -E "s|badge/OS-Talos_Linux(_[^-]+)?-FF7300|badge/OS-Talos_Linux_${TALOS_VERSION_CLEAN}-FF7300|g" README.md
+
+          # Update Flux badge (handles both with and without existing version)
+          sed -i -E "s|badge/GitOps-FluxCD(_[^-]+)?-5468FF|badge/GitOps-FluxCD_${FLUX_VERSION_CLEAN}-5468FF|g" README.md
+
+      - name: Check for changes
+        id: git-check
+        run: |
+          git diff --exit-code README.md || echo "changed=true" >> $GITHUB_OUTPUT
+
+      - name: Commit and push changes
+        if: steps.git-check.outputs.changed == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add README.md
+          git commit -m "chore(readme): update Talos and Flux versions
+
+          - Talos: ${{ steps.talos.outputs.version }}
+          - Flux: ${{ steps.flux.outputs.version }}"
+          git push
