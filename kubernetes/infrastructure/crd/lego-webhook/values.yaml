@@ -1,0 +1,4 @@
+certManager:
+  namespace: cert-manager
+  serviceAccount:
+    name: cert-manager
