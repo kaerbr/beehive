@@ -1,3 +1,4 @@
 namespace: default
 resources:
   - ./podinfo
+  - beehive.lan64.de.ingress.yaml

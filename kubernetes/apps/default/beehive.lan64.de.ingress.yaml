@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: beehive
+spec:
+  ingressClassName: traefik
+  tls:
+    - secretName: beehive.lan64.de
+  rules:
+    - host: podinfo.beehive.lan64.de
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: podinfo
+                port:
+                  name: http
