@@ -1,0 +1,22 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: ipv64
+spec:
+  acme:
+    privateKeySecretRef:
+      name: ipv64
+    # server: https://acme-v02.api.letsencrypt.org/directory
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    # email: mymail@mymailprovider.mail
+    solvers:
+      - dns01:
+          webhook:
+            groupName: lego.dns-solver
+            solverName: lego-solver
+            config:
+              # available provider refer to https://go-acme.github.io/lego/dns/#dns-providers
+              provider: ipv64
+              envFrom:
+                secret:
+                  name: ipv64-api-key
