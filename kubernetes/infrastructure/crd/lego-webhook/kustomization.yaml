@@ -1,0 +1,9 @@
+namespace: traefik
+resources:
+  - helm.yaml
+configMapGenerator:
+  - name: cert-manager-lego-webhook-helm-values
+    files:
+      - values.yaml
+generatorOptions:
+  disableNameSuffixHash: true
