@@ -14,3 +14,5 @@ RUN addgroup -g ${USER_GID} ${USERNAME} && adduser -u ${USER_UID} -G ${USERNAME}
 # Standard-User setzen
 USER ${USERNAME}
 WORKDIR /home/${USERNAME}
+
+ENV EDITOR="code --wait"
