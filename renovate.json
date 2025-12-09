@@ -16,5 +16,29 @@
       "/(?:^|/)gotk-components\\.ya?ml$/",
       "kubernetes/infrastructure/crd/**/helm.yaml"
     ]
-  }
+  },
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["^README\\.md$"],
+      "matchStrings": [
+        "img\\.shields\\.io\\/badge\\/(?<depName>.+?)-v?(?<currentValue>\\d[^-\\?]+)-"
+      ],
+      "datasourceTemplate": "github-releases"
+    }
+  ],
+  "packageRules": [
+    {
+      "matchDepNames": ["Talos"],
+      "packageName": "siderolabs/talos"
+    },
+    {
+      "matchDepNames": ["Kubernetes"],
+      "packageName": "kubernetes/kubernetes"
+    },
+    {
+      "matchDepNames": ["Flux"],
+      "packageName": "fluxcd/flux2"
+    }
+  ]
 }
