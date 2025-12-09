@@ -16,5 +16,45 @@
       "/(?:^|/)gotk-components\\.ya?ml$/",
       "kubernetes/infrastructure/crd/**/helm.yaml"
     ]
-  }
+  },
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Update Talos version in version file and README badge",
+      "managerFilePatterns": ["talos/version.yaml", "README.md"],
+      "matchStrings": [
+        "version: (?<currentValue>v[\\d.]+)",
+        "badge/Talos-(?<currentValue>v[\\d.]+)-"
+      ],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "siderolabs/talos"
+    },
+    {
+      "customType": "regex",
+      "description": "Update Kubernetes version in version file and README badge",
+      "managerFilePatterns": ["kubernetes/version.yaml", "README.md"],
+      "matchStrings": [
+        "version: (?<currentValue>v[\\d.]+)",
+        "badge/Kubernetes-(?<currentValue>v[\\d.]+)-"
+      ],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "kubernetes/kubernetes"
+    },
+    {
+      "customType": "regex",
+      "description": "Update Flux version in README badge",
+      "managerFilePatterns": ["README.md"],
+      "matchStrings": ["badge/Flux-(?<currentValue>v[\\d.]+)-"],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "fluxcd/flux2"
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "Group Flux updates (gotk-components.yaml + README badge) into single PR",
+      "matchDatasources": ["github-releases"],
+      "matchPackageNames": ["fluxcd/flux2"],
+      "groupName": "Flux"
+    }
+  ]
 }
