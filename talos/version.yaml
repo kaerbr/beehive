@@ -1,0 +1,4 @@
+# Talos Linux version
+# This file is tracked by Renovate and serves as the source of truth for the Talos version
+# When upgrading Talos, this version should match the image used in: talosctl upgrade --image ghcr.io/siderolabs/installer:v<VERSION>
+version: v1.11.5
