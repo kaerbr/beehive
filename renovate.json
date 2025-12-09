@@ -20,25 +20,43 @@
   "customManagers": [
     {
       "customType": "regex",
-      "managerFilePatterns": ["^README\\.md$"],
+      "description": "Update Talos version in version file and README badge",
+      "fileMatch": ["^talos/version\\.yaml$", "^README\\.md$"],
       "matchStrings": [
-        "img\\.shields\\.io\\/badge\\/(?<depName>.+?)-v?(?<currentValue>\\d[^-\\?]+)-"
+        "version: (?<currentValue>v\\d+\\.\\d+\\.\\d+)",
+        "\\[!\\[Talos\\]\\(https:\\/\\/img\\.shields\\.io\\/badge\\/Talos-(?<currentValue>v[^-]+)-"
       ],
-      "datasourceTemplate": "github-releases"
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "siderolabs/talos"
+    },
+    {
+      "customType": "regex",
+      "description": "Update Kubernetes version in version file and README badge",
+      "fileMatch": ["^kubernetes/version\\.yaml$", "^README\\.md$"],
+      "matchStrings": [
+        "version: (?<currentValue>v\\d+\\.\\d+\\.\\d+)",
+        "\\[!\\[Kubernetes\\]\\(https:\\/\\/img\\.shields\\.io\\/badge\\/Kubernetes-(?<currentValue>v[^-]+)-"
+      ],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "kubernetes/kubernetes"
+    },
+    {
+      "customType": "regex",
+      "description": "Update Flux version in README badge",
+      "fileMatch": ["^README\\.md$"],
+      "matchStrings": [
+        "\\[!\\[Flux\\]\\(https:\\/\\/img\\.shields\\.io\\/badge\\/Flux-(?<currentValue>v[^-]+)-"
+      ],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "fluxcd/flux2"
     }
   ],
   "packageRules": [
     {
-      "matchDepNames": ["Talos"],
-      "packageName": "siderolabs/talos"
-    },
-    {
-      "matchDepNames": ["Kubernetes"],
-      "packageName": "kubernetes/kubernetes"
-    },
-    {
-      "matchDepNames": ["Flux"],
-      "packageName": "fluxcd/flux2"
+      "description": "Group Flux updates (gotk-components.yaml + README badge) into single PR",
+      "matchDatasources": ["github-releases"],
+      "matchPackageNames": ["fluxcd/flux2"],
+      "groupName": "Flux"
     }
   ]
 }
