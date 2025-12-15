@@ -24,3 +24,14 @@
 # Talos specific ignores
 talos/secrets.yaml
 talos/rendered/
+# Talos temporary files
+talos/**/*.tmp
+talos/**/secrets.yaml
+
+# SOPS temporary decrypt files
+*.dec.yaml
+.decrypted~*
+
+# Age keys (in case someone copies here)
+*.key
+age.key

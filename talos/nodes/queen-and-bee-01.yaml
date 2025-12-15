@@ -1,0 +1,26 @@
+---
+machine:
+  network:
+    hostname: queen-and-bee-01
+    interfaces:
+      - deviceSelector:
+          physical: true
+      # Assigns static IP addresses to the interface.
+        addresses:
+          - 192.168.178.11/24
+          - fd00::11/16
+    # Specify dns hostname lookups for other nodes in the cluster.
+    extraHostEntries:
+      - ip: 192.168.178.181
+        aliases:
+          - virtual-01
+
+  install:
+    disk: /dev/sdb
+
+  # Configures the node labels for the machine.
+  nodeLabels:
+    beehive.lan64.de/model: Wyse-5070
+    beehive.lan64.de/cpu: Pentium-J5005
+    beehive.lan64.de/memory: 16GB
+    beehive.lan64.de/storage: 256GB
