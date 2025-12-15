@@ -115,22 +115,28 @@ age-keygen -y ~/.config/sops/age/keys.txt
 ### 2️⃣ Bootstrap Talos Linux
 
 ```bash
-# Generate Talos machine configs
 cd talos/
-talosctl gen config beehive https://192.168.178.10:6443 \
-  --with-secrets './secrets.sops.yaml' \
-  --config-patch '@./common.patches.yaml' \
-  --config-patch-control-plane '@./vip.yaml' \
-  --output ./rendered/
 
-# Alternatively create a new set of secrets
-talosctl gen secrets
+# Generate Talos machine configs
+talosctl gen config <CLUSTER_NAME> https://192.168.178.10:6443 \
+  --with-secrets <(sops -d secrets.sops.yaml) \
+  --config-patch @patches/allow-controlplane-workloads.yaml \
+  --config-patch @patches/cluster-config.yaml \
+  --config-patch @patches/local-path-provisioner.yaml \
+  --config-patch @patches/machine-network-common.yaml \
+  --config-patch @patches/metrics-server.yaml \
+  --config-patch @patches/ntp.yaml \
+  --config-patch-control-plane @patches/vip.yaml \
+  --output rendered/
 
 # Apply config to node (replace <NODE_IP> for every node)
 talosctl apply-config --insecure \
   --nodes <NODE_IP> \
   --file ./rendered/controlplane.yaml \
   --config-patch '@./queen-and-bee-01.yaml'
+
+# Set endpoints for talosctl
+talosctl config endpoint <NODE_IP>...
 
 # Bootstrap Kubernetes (wait for node to be ready first)
 talosctl bootstrap --talosconfig ./rendered/talosconfig --nodes <NODE_IP>
@@ -148,9 +154,10 @@ kubectl get nodes
 
 ```bash
 # Create SOPS age secret in cluster (CRITICAL: Do this BEFORE bootstrapping Flux)
+kubectl create namespace flux-system
 kubectl create secret generic sops-age \
   --namespace=flux-system \
-  --from-file age.agekey=~/.config/sops/age/keys.txt
+  --from-file age.agekey=${HOME}/.config/sops/age/keys.txt
 
 # Bootstrap Flux (replace placeholders)
 flux bootstrap github \

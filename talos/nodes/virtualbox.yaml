@@ -1,16 +1,21 @@
+---
 machine:
   network:
-    hostname: queen-and-bee-01
+    hostname: virtual-01
     interfaces:
       - deviceSelector:
           physical: true
       # Assigns static IP addresses to the interface.
         addresses:
-          - fd00::11/16
-          - 192.168.178.11/24
+          - 192.168.178.181/24
+    # Specify dns hostname lookups for other nodes in the cluster.
+    extraHostEntries:
+      - ip: 192.168.178.181
+        aliases:
+          - virtual-01
 
   install:
-    disk: /dev/sdb
+    disk: /dev/sda
 
   # Configures the node labels for the machine.
   nodeLabels:
@@ -18,13 +23,3 @@ machine:
     beehive.lan64.de/cpu: Pentium-J5005
     beehive.lan64.de/memory: 16GB
     beehive.lan64.de/storage: 256GB
-
-  kubelet:
-    extraMounts:
-      - destination: /var/mnt/local-path-provisioner
-        type: bind
-        source: /var/mnt/local-path-provisioner
-        options:
-          - bind
-          - rshared
-          - rw

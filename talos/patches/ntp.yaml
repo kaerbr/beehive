@@ -1,0 +1,6 @@
+---
+machine:
+  time:
+    servers:
+      - pool.ntp.org
+    bootTimeout: 2m0s # Specifies the timeout when the node time is considered to be in sync unlocking the boot sequence

@@ -1,0 +1,8 @@
+---
+machine:
+  network:
+    interfaces:
+      - deviceSelector:
+          physical: true
+        vip:
+          ip: 192.168.178.180
