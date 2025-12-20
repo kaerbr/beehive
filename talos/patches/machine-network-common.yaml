@@ -5,7 +5,7 @@ machine:
     # `interfaces` is used to define the network interface configuration.
     interfaces:
       - deviceSelector:
-          physical: true
+          busPath: "0*" # should select any hardware network device, if you have just one, it will be selected
         # A list of routes associated with the interface.
         routes:
           - network: 0.0.0.0/0 # The route's network (destination).

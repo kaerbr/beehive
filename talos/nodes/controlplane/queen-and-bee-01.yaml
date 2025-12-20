@@ -1,0 +1,36 @@
+---
+machine:
+  network:
+    hostname: &hostname queen-and-bee-01
+    interfaces:
+      - deviceSelector:
+          busPath: "0*" # should select any hardware network device, if you have just one, it will be selected
+      # Assigns static IP addresses to the interface.
+        addresses:
+          - &ipv4Address 192.168.178.11/24
+          - fd00::11/16
+    # Specify dns hostname lookups for other nodes in the cluster.
+    extraHostEntries:
+      - ip: *ipv4Address
+        aliases:
+          - *hostname
+
+  install:
+    disk: /dev/sda
+
+  # Configures the node labels for the machine.
+  nodeLabels:
+    beehive.lan64.de/model: Wyse-5070
+    beehive.lan64.de/cpu: Pentium-J5005
+    beehive.lan64.de/memory: 16GB
+    beehive.lan64.de/ephemeral: 256GB
+    beehive.lan64.de/storage: 128GB
+---
+apiVersion: v1alpha1
+kind: UserVolumeConfig
+name: local-path-provisioner
+provisioning:
+  diskSelector:
+    match: disk.transport == 'nvme'
+  minSize: 50GiB
+  grow: true

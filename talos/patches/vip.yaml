@@ -3,6 +3,6 @@ machine:
   network:
     interfaces:
       - deviceSelector:
-          physical: true
+          busPath: "0*" # should select any hardware network device, if you have just one, it will be selected
         vip:
-          ip: 192.168.178.180
+          ip: 192.168.178.10
