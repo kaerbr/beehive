@@ -15,3 +15,9 @@ creation_rules:
     key_groups:
       - age:
           - age1ycyh0u3pvt39sucsd3jznl6ut4a4qz09f6wruqrl2565ddwhpd5qhrglw7
+  # Blocky Config
+  - path_regex: kubernetes/apps/networking/blocky/.*\.sops\.ya?ml$
+    encrypted_regex: '^(config.yml)$'
+    key_groups:
+      - age:
+          - age1ycyh0u3pvt39sucsd3jznl6ut4a4qz09f6wruqrl2565ddwhpd5qhrglw7

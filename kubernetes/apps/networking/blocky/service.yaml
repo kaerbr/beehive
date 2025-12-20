@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: blocky-dns
+  labels:
+    app: blocky
+  annotations:
+    metallb.io/loadBalancerIPs: "192.168.178.101, fd00::101"
+spec:
+  ipFamilyPolicy: PreferDualStack
+  ipFamilies:
+    - IPv4
+    - IPv6
+  externalTrafficPolicy: Local
+  type: LoadBalancer
+  ports:
+    - name: dnstcp
+      port: 53
+      protocol: TCP
+      targetPort: dnstcp
+    - name: dnsudp
+      port: 53
+      protocol: UDP
+      targetPort: dnsudp
+  selector:
+    app: blocky
+---
+apiVersion: v1
+kind: Service
+metadata:
+ name: blocky-api
+ labels:
+   app: blocky
+spec:
+ type: ClusterIP
+ ports:
+   - name: http
+     port: 4000
+     protocol: TCP
+     targetPort: http
+ selector:
+   app: blocky

@@ -1,0 +1,4 @@
+resources:
+  - configmap.sops.yaml
+  - deployment.yaml
+  - service.yaml
