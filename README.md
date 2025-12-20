@@ -31,25 +31,41 @@ A declarative, GitOps-managed Kubernetes homelab running on Talos Linux. All inf
 │   │   └── apps.fluxomization.yaml
 │   │
 │   ├── infrastructure/
-│   │   ├── crd/                                # Helm charts (cert-manager, traefik, etc.)
-│   │   └── config/                             # Configuration CRs (ClusterIssuer, IPAddressPool, etc.)
-│   │                                           # ⚠️ SOPS decryption enabled here
+│   │   ├── crd/                                    # Helm charts (cert-manager, traefik, etc.)
+│   │   └── config/                                 # Configuration CRs (ClusterIssuer, IPAddressPool, etc.)
+│   │                                               # ⚠️ SOPS decryption enabled here
 │   └── apps/
-│       └── <namespace>/<app>/                  # Application deployments
+│       └── <namespace>/<app>/                      # Application deployments
 │           ├── deployment.yaml
 │           └── kustomization.yaml
 │
-├── 📂 talos/                                   # Talos machine configuration
-│   ├── secrets.sops.yaml                       # Encrypted Talos cluster secrets
-│   ├── common.patches.yaml                     # Common patches (all nodes)
-│   ├── vip.yaml                                # VIP configuration
-│   └── queen-and-bee-01.yaml                   # Node-specific patches
+├── 📂 talos/                                       # Talos machine configuration
+│   ├── bootstrap-multi-node.sh                     # Automated cluster bootstrap script
+│   ├── secrets.sops.yaml                           # Encrypted Talos cluster secrets
+│   ├── version.yaml                                # Talos Linux version specification
+│   ├── nodes/                                      # Node-specific configurations
+│   │   └── controlplane/                           # Control plane node definitions
+│   │       ├── queen-and-bee-01.yaml               # Physical node config
+│   │       ├── virtualbox-01.yaml                  # Virtual node 1
+│   │       └── virtualbox-02.yaml                  # Virtual node 2
+│   ├── patches/                                    # Configuration patches (all nodes)
+│   │   ├── allow-controlplane-workloads.yaml       # Enable pod scheduling on CP
+│   │   ├── allow-controlplane-loadbalancer.yaml    # Enable loadbalancer scheduling on CP
+│   │   ├── cluster-config.yaml                     # Cluster network settings
+│   │   ├── machine-network-common.yaml             # Common network config
+│   │   ├── metrics-server.yaml                     # Metrics server deployment
+│   │   ├── ntp.yaml                                # NTP time sync
+│   │   └── vip.yaml                                # Virtual IP configuration
+│   └── rendered/                                   # Generated configs (output)
+│       ├── controlplane.yaml                       # Generated CP config
+│       ├── worker.yaml                             # Generated worker config
+│       └── talosconfig                             # Talos API client config
 │
-├── 📂 .devcontainer/                           # VSCode DevContainer setup
-│   ├── Dockerfile                              # Alpine + talosctl, sops, age, kustomize
-│   └── devcontainer.json                       # Auto-mounts age key from host
+├── 📂 .devcontainer/                               # VSCode DevContainer setup
+│   ├── Dockerfile                                  # Alpine + talosctl, sops, age, kustomize
+│   └── devcontainer.json                           # Auto-mounts age key from host
 │
-└── .sops.yaml                                  # SOPS encryption rules
+└── .sops.yaml                                      # SOPS encryption rules
 ```
 
 **Dependency Flow:**
@@ -114,41 +130,46 @@ age-keygen -y ~/.config/sops/age/keys.txt
 
 ### 2️⃣ Bootstrap Talos Linux
 
+The `bootstrap-multi-node.sh` script automates the entire Talos cluster setup process.
+
 ```bash
 cd talos/
 
-# Generate Talos machine configs
-talosctl gen config <CLUSTER_NAME> https://192.168.178.10:6443 \
-  --with-secrets <(sops -d secrets.sops.yaml) \
-  --config-patch @patches/allow-controlplane-workloads.yaml \
-  --config-patch @patches/cluster-config.yaml \
-  --config-patch @patches/local-path-provisioner.yaml \
-  --config-patch @patches/machine-network-common.yaml \
-  --config-patch @patches/metrics-server.yaml \
-  --config-patch @patches/ntp.yaml \
-  --config-patch-control-plane @patches/vip.yaml \
-  --output rendered/
+# Bootstrap cluster with control plane nodes
+# Syntax: ./bootstrap-multi-node.sh -c <node_file>:<current_ip> ... [-w <worker_file>:<current_ip> ...] <cluster_name>
 
-# Apply config to node (replace <NODE_IP> for every node)
-talosctl apply-config --insecure \
-  --nodes <NODE_IP> \
-  --file ./rendered/controlplane.yaml \
-  --config-patch '@./queen-and-bee-01.yaml'
+# Example 1: Single control plane node (testing/homelab)
+./bootstrap-multi-node.sh \
+  -c nodes/controlplane/queen-and-bee-01.yaml:192.168.178.158 \
+  beehive
 
-# Set endpoints for talosctl
-talosctl config endpoint <NODE_IP>...
+# Example 2: High-availability cluster (3 control planes + 2 workers)
+./bootstrap-multi-node.sh \
+  -c nodes/controlplane/queen-and-bee-01.yaml:192.168.178.158 \
+  -c nodes/controlplane/virtualbox-01.yaml:192.168.178.159 \
+  -c nodes/controlplane/virtualbox-02.yaml:192.168.178.160 \
+  -w nodes/worker/worker-01.yaml:192.168.178.161 \
+  -w nodes/worker/worker-02.yaml:192.168.178.162 \
+  beehive
 
-# Bootstrap Kubernetes (wait for node to be ready first)
-talosctl bootstrap --talosconfig ./rendered/talosconfig --nodes <NODE_IP>
-
-# Retrieve kubeconfig
-talosctl kubeconfig --talosconfig ./rendered/talosconfig \
-  --nodes <NODE_IP> \
-  --endpoints <NODE_IP>
+# The script will:
+# [1/6] Generate Talos configurations (applies all patches)
+# [2/6] Apply configuration to control plane nodes (with confirmation prompts)
+# [3/6] Wait for control plane nodes to initialize (etcd readiness)
+# [4/6] Bootstrap Kubernetes on first control plane
+# [5/6] Apply configuration to worker nodes (if any)
+# [6/6] Generate kubeconfig
 
 # Verify cluster is up
 kubectl get nodes
 ```
+
+**Script Features:**
+- Reads VIP and final IPs automatically from node YAML files
+- Interactive confirmation before applying configs to each node
+- Validates cluster health at each step
+- Exports `TALOSCONFIG` automatically
+- Supports single-node and multi-node clusters
 
 ### 3️⃣ Bootstrap Flux CD
 
