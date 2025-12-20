@@ -1,0 +1,5 @@
+namespace: networking
+resources:
+  - namespace.yaml
+  - beehive.lan64.de.ingress.yaml
+  - ./blocky
