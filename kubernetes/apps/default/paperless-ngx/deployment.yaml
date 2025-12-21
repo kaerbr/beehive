@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: paperless-ngx
+  labels:
+    app: paperless-ngx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: paperless-ngx
+      name: paperless-ngx
+  template:
+    metadata:
+      name: paperless-ngx
+      labels:
+        app: paperless-ngx
+        name: paperless-ngx
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: paperless-ngx
+          image: ghcr.io/paperless-ngx/paperless-ngx:2.20.0
+          env:
+            - name: PAPERLESS_URL
+              value: https://paperless-ngx.beehive.lan64.de
+            - name: PAPERLESS_ADMIN_USER
+              valueFrom:
+                secretKeyRef:
+                  name: paperless-ngx
+                  key: PAPERLESS_ADMIN_USER
+            - name: PAPERLESS_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: paperless-ngx
+                  key: PAPERLESS_ADMIN_PASSWORD
+            - name: PAPERLESS_OCR_LANGUAGE
+              value: deu
+            - name: PAPERLESS_FILENAME_FORMAT
+              value: "{{ created_year }}/{{ created_month }}/{{ correspondent }}/{{ title }}"
+          ports:
+            - name: http
+              containerPort: 8000
+          resources:
+            requests:
+              cpu: 100m
+              memory: 500Mi
+              ephemeral-storage: 1Gi
+            limits:
+              cpu: 1000m
+              memory: 6Gi
+              ephemeral-storage: 10Gi
+          volumeMounts:
+            - mountPath: /usr/src/paperless/data
+              name: data
+            - mountPath: /usr/src/paperless/media
+              name: media
+            - mountPath: /usr/src/paperless/consume
+              name: consume
+            - mountPath: /backup
+              name: backup
+        - name: redis
+          image: redis:8.4.0-alpine
+          ports:
+            - name: redis
+              containerPort: 6379
+          resources:
+            requests:
+              cpu: 10m
+              memory: 128Mi
+              ephemeral-storage: 1Gi
+            limits:
+              cpu: 100m
+              memory: 500Mi
+              ephemeral-storage: 10Gi
+          volumeMounts:
+            - name: redisdata
+              mountPath: /data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: paperless-ngx-data
+        - name: media
+          persistentVolumeClaim:
+            claimName: paperless-ngx-media
+        - name: consume
+          persistentVolumeClaim:
+            claimName: paperless-ngx-consume
+        - name: backup
+          persistentVolumeClaim:
+            claimName: paperless-ngx-backup
+        - name: redisdata
+          persistentVolumeClaim:
+            claimName: paperless-ngx-redisdata

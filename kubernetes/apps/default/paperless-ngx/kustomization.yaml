@@ -1,0 +1,9 @@
+resources:
+  - ./pvc/backup.pvc.yaml
+  - ./pvc/consume.pvc.yaml
+  - ./pvc/data.pvc.yaml
+  - ./pvc/media.pvc.yaml
+  - ./pvc/redisdata.pvc.yaml
+  - secret.sops.yaml
+  - deployment.yaml
+  - service.yaml
