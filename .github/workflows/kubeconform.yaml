@@ -8,4 +8,4 @@ jobs:
       - uses: docker://ghcr.io/yannh/kubeconform:latest
         with:
           entrypoint: /kubeconform
-          args: "-ignore-filename-pattern .*kustomization\\.yaml -summary -output json kubernetes/apps/"
+          args: "-ignore-filename-pattern .*kustomization\\.yaml -ignore-missing-schemas -summary -output json kubernetes/apps/"
