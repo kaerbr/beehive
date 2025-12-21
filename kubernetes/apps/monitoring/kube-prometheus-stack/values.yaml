@@ -1,0 +1,12 @@
+grafana:
+  admin:
+    existingSecret: grafana-credentials
+    userKey: admin-user
+    passwordKey: admin-password
+  ingress:
+    enabled: true
+    ingressClassName: traefik
+    hosts:
+      - grafana.beehive.lan64.de
+    tls:
+      - secretName: beehive.lan64.de

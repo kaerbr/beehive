@@ -1,6 +1,6 @@
 # namespace: cert-manager
 resources:
-  - lan64.certificate.default.yaml
+  - lan64.certificate.yaml
   - lan64.clusterIssuer.yaml
   - lan64.secret.sops.yaml
 

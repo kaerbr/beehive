@@ -1,3 +1,9 @@
 resources:
   - helm.yaml
-
+  - grafana-credentials.secret.sops.yaml
+configMapGenerator:
+  - name: kube-prometheus-stack-helm-values
+    files:
+      - values.yaml
+generatorOptions:
+  disableNameSuffixHash: true
