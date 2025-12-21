@@ -1,7 +1,7 @@
 FROM alpine:3.23
 
 # Install packages and download tools with checksum verification
-RUN apk add --no-cache bash grep yq-go nano git age sops kustomize flux kubectl k9s \
+RUN apk add --no-cache bash grep yq-go nano git age sops kustomize flux kubectl k9s helm \
     # talosctl with checksum
     && wget -q "https://github.com/siderolabs/talos/releases/latest/download/sha256sum.txt" -O /tmp/checksums.txt \
     && wget -q "https://github.com/siderolabs/talos/releases/latest/download/talosctl-linux-amd64" -O /tmp/talosctl-linux-amd64 \
