@@ -24,3 +24,6 @@ spec:
         name: kube-prometheus-stack
         namespace: monitoring
       interval: 6h
+  valuesFrom:
+    - kind: ConfigMap
+      name: kube-prometheus-stack-helm-values

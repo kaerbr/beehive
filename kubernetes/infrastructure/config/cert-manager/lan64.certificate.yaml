@@ -1,0 +1,29 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: beehive.lan64.de
+  namespace: default
+spec:
+  secretName: beehive.lan64.de
+  commonName: beehive.lan64.de
+  issuerRef:
+    name: ipv64
+    kind: ClusterIssuer
+  dnsNames:
+    - beehive.lan64.de
+    - "*.beehive.lan64.de"
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: beehive.lan64.de
+  namespace: monitoring
+spec:
+  secretName: beehive.lan64.de
+  commonName: beehive.lan64.de
+  issuerRef:
+    name: ipv64
+    kind: ClusterIssuer
+  dnsNames:
+    - beehive.lan64.de
+    - "*.beehive.lan64.de"
