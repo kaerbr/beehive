@@ -1,20 +1,14 @@
 ---
-machine:
-  # Provides machine specific network configuration options.
-  network:
-    # `interfaces` is used to define the network interface configuration.
-    interfaces:
-      - deviceSelector:
-          busPath: "0*" # should select any hardware network device, if you have just one, it will be selected
-        # A list of routes associated with the interface.
-        routes:
-          - network: 0.0.0.0/0 # The route's network (destination).
-            gateway: 192.168.178.1 # The route's gateway (if empty, creates link scope route).
-        dhcp: false
-
-    # Used to statically set the nameservers for the machine.
-    nameservers:
-      - 9.9.9.9
-      - 149.112.112.112
-      - 2620:fe::fe
-      - 2620:fe::9
+apiVersion: v1alpha1
+kind: LinkConfig
+name: net0
+routes:
+  - gateway: 192.168.178.1
+---
+apiVersion: v1alpha1
+kind: ResolverConfig
+nameservers:
+  - address: 9.9.9.9
+  - address: 149.112.112.112
+  - address: 2620:fe::fe
+  - address: 2620:fe::9

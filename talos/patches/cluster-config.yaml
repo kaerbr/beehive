@@ -2,7 +2,6 @@
 cluster:
   # Provides cluster specific network configuration options.
   network:
-    dnsDomain: cluster.local # The domain used by Kubernetes DNS.
     # The pod subnet CIDR.
     podSubnets:
       - 10.244.0.0/16

@@ -1,18 +1,16 @@
 ---
 machine:
-  network:
-    hostname: &hostname virtualbox-01
-    interfaces:
-      - deviceSelector:
-          busPath: "0*" # should select any hardware network device, if you have just one, it will be selected
-      # Assigns static IP addresses to the interface.
-        addresses:
-          - &ipv4Address 192.168.178.181/24
-    # Specify dns hostname lookups for other nodes in the cluster.
-    extraHostEntries:
-      - ip: *ipv4Address
-        aliases:
-          - *hostname
-
   install:
     disk: /dev/sda
+---
+apiVersion: v1alpha1
+kind: LinkAliasConfig
+name: net0
+selector:
+  match: true # as there is a single link only, we can match it this way
+---
+apiVersion: v1alpha1
+kind: LinkConfig
+name: net0
+addresses:
+  - address: 192.168.178.181/24
