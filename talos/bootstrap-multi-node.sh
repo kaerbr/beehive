@@ -61,7 +61,7 @@ CLUSTER_NAME="$1"
 # =============================================================================
 
 # Read VIP
-VIP=$(yq -e '.machine.network.interfaces[0].vip.ip' patches/vip.yaml) || {
+VIP=$(yq -e '.name' patches/vip.yaml) || {
   echo "Error: Could not read VIP from patches/vip.yaml"
   exit 1
 }
@@ -82,7 +82,7 @@ fi
 for node_entry in "${CP_NODES[@]}"; do
   NODE_FILE="${node_entry%%:*}"
   CURRENT_IP="${node_entry##*:}"
-  FINAL_IP=$(yq -e 'select(di == 0) | .machine.network.interfaces[0].addresses[0]' "${NODE_FILE}" | cut -d'/' -f1) || {
+  FINAL_IP=$(yq -e 'select(.kind == "LinkConfig").addresses[] | select( (.address | contains(":")) | not ) | .address' "${NODE_FILE}" | cut -d'/' -f1) || {
     echo "Error: Could not read static IP from ${NODE_FILE}"
     exit 1
   }
@@ -96,7 +96,7 @@ done
 for node_entry in "${WORKER_NODES[@]}"; do
   NODE_FILE="${node_entry%%:*}"
   CURRENT_IP="${node_entry##*:}"
-  FINAL_IP=$(yq -e 'select(di == 0) | .machine.network.interfaces[0].addresses[0]' "${NODE_FILE}" | cut -d'/' -f1) || {
+  FINAL_IP=$(yq -e 'select(.kind == "LinkConfig").addresses[] | select( (.address | contains(":")) | not ) | .address' "${NODE_FILE}" | cut -d'/' -f1) || {
     echo "Error: Could not read static IP from ${NODE_FILE}"
     exit 1
   }
