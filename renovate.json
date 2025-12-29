@@ -20,11 +20,16 @@
   "customManagers": [
     {
       "customType": "regex",
-      "description": "Update Talos version in version file and README badge",
-      "managerFilePatterns": ["talos/version.yaml", "README.md"],
+      "description": "Update Talos version in version file, README badge and Dockerfile",
+      "managerFilePatterns": [
+        "talos/version.yaml",
+        "README.md",
+        ".devcontainer/Dockerfile"
+      ],
       "matchStrings": [
         "version: (?<currentValue>v[\\d.]+)",
-        "badge/Talos-(?<currentValue>v[\\d.]+)-"
+        "badge/Talos-(?<currentValue>v[\\d.]+)-",
+        "ARG TALOS_VERSION=(?<currentValue>v[\\d.]+)"
       ],
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "siderolabs/talos"
@@ -42,9 +47,15 @@
     },
     {
       "customType": "regex",
-      "description": "Update Flux version in README badge",
-      "managerFilePatterns": ["README.md"],
-      "matchStrings": ["badge/Flux-(?<currentValue>v[\\d.]+)-"],
+      "description": "Update Flux version in README badge and Dockerfile",
+      "managerFilePatterns": [
+        "README.md",
+        ".devcontainer/Dockerfile"
+      ],
+      "matchStrings": [
+        "badge/Flux-(?<currentValue>v[\\d.]+)-",
+        "ARG FLUX_VERSION=(?<currentValue>v[\\d.]+)"
+      ],
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "fluxcd/flux2"
     }
