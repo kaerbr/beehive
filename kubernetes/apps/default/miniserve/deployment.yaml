@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: miniserve
+  labels:
+    app: miniserve
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: miniserve
+  template:
+    metadata:
+      labels:
+        app: miniserve
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: miniserve
+          image: svenstaro/miniserve:0.32.0-alpine
+          args:
+            - /data
+            - --upload-files
+            - --mkdir
+            - --rm-files
+            - --qrcode
+            - --on-duplicate-files
+            - rename
+            - --port
+            - "8080"
+          ports:
+            - containerPort: 8080
+              name: http
+          volumeMounts:
+            - name: paperless-ngx-backup
+              mountPath: /data/paperless-ngx/backup
+            - name: paperless-ngx-consume
+              mountPath: /data/paperless-ngx/consume
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 1000m
+              memory: 2Gi
+      volumes:
+        - name: paperless-ngx-backup
+          persistentVolumeClaim:
+            claimName: paperless-ngx-backup
+        - name: paperless-ngx-consume
+          persistentVolumeClaim:
+            claimName: paperless-ngx-consume

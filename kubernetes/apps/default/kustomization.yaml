@@ -2,4 +2,5 @@ namespace: default
 resources:
   - ./podinfo
   - ./paperless-ngx
+  - ./miniserve
   - beehive.lan64.de.ingress.yaml
