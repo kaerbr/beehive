@@ -1,8 +1,10 @@
-name: gitleaks
-on: [push, pull_request, workflow_dispatch]
+name: Mandatory Security Scans
+# Run on every push to any branch.
+# We DO NOT include 'pull_request' here, so it never runs twice.
+on: [push, workflow_dispatch]
 jobs:
-  scan:
-    name: gitleaks
+  gitleaks:
+    name: Gitleaks
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
