@@ -1,5 +1,5 @@
 resources:
-  - github.com/rancher/local-path-provisioner/deploy?ref=v0.0.33
+  - github.com/rancher/local-path-provisioner/deploy?ref=v0.0.34
 patches:
   - patch: |-
       kind: ConfigMap
