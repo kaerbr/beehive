@@ -12,3 +12,13 @@ grafana:
       - grafana.beehive.lan64.de
     tls:
       - secretName: beehive.lan64.de
+
+prometheus:
+  prometheusSpec:
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 5Gi
