@@ -39,10 +39,9 @@ spec:
           resources:
             requests:
               cpu: 10m
-              memory: 32Mi
+              memory: 100Mi
             limits:
-              cpu: 1000m
-              memory: 2Gi
+              memory: 100Mi
       volumes:
         - name: paperless-ngx-backup
           persistentVolumeClaim:

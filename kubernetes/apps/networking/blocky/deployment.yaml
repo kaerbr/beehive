@@ -42,12 +42,11 @@ spec:
               subPath: config.yml
           resources:
             requests:
-              cpu: 25m
-              memory: 250Mi
+              cpu: 400m
+              memory: 509Mi
               ephemeral-storage: 500Mi
             limits:
-              cpu: 1000m
-              memory: 2Gi
+              memory: 509Mi
               ephemeral-storage: 1Gi
 #          securityContext:
 #            capabilities:

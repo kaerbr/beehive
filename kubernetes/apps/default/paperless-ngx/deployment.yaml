@@ -43,12 +43,11 @@ spec:
               containerPort: 8000
           resources:
             requests:
-              cpu: 100m
-              memory: 500Mi
+              cpu: 10m
+              memory: 747Mi
               ephemeral-storage: 1Gi
             limits:
-              cpu: 3000m
-              memory: 8Gi
+              memory: 747Mi
               ephemeral-storage: 10Gi
           volumeMounts:
             - mountPath: /usr/src/paperless/data
@@ -67,11 +66,10 @@ spec:
           resources:
             requests:
               cpu: 10m
-              memory: 128Mi
+              memory: 100Mi
               ephemeral-storage: 1Gi
             limits:
-              cpu: 100m
-              memory: 500Mi
+              memory: 100Mi
               ephemeral-storage: 10Gi
           volumeMounts:
             - name: redisdata
