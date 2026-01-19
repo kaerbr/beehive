@@ -44,10 +44,10 @@ spec:
           resources:
             requests:
               cpu: 10m
-              memory: 747Mi
+              memory: 2Gi
               ephemeral-storage: 1Gi
             limits:
-              memory: 747Mi
+              memory: 2Gi
               ephemeral-storage: 10Gi
           volumeMounts:
             - mountPath: /usr/src/paperless/data
