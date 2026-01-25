@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: lancache
+  labels:
+    app: lancache
+  annotations:
+    metallb.io/loadBalancerIPs: "192.168.178.102, fd00::102"
+spec:
+  ipFamilyPolicy: PreferDualStack
+  ipFamilies:
+    - IPv4
+    - IPv6
+  type: LoadBalancer
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+    - name: https
+      port: 443
+      targetPort: https
+  selector:
+    name: lancache

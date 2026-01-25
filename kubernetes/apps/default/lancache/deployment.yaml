@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lancache
+  labels:
+    app: lancache
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lancache
+      name: lancache
+  template:
+    metadata:
+      name: lancache
+      labels:
+        app: lancache
+        name: lancache
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: lancache
+          image: lancachenet/monolithic
+          env:
+            - name: CACHE_DISK_SIZE
+              value: 150g
+            - name: UPSTREAM_DNS
+              value: 9.9.9.9
+            - name: TZ
+              value: Europe/Berlin
+          ports:
+            - name: http
+              containerPort: 80
+            - name: https
+              containerPort: 443
+          resources:
+            requests:
+              cpu: 10m
+              memory: 2Gi
+              ephemeral-storage: 1Gi
+            limits:
+              memory: 2Gi
+              ephemeral-storage: 10Gi
+          volumeMounts:
+            - mountPath: /data/cache
+              name: cache
+            - mountPath: /data/logs
+              name: logs
+      volumes:
+        - name: cache
+          persistentVolumeClaim:
+            claimName: lancache-cache
+        - name: logs
+          persistentVolumeClaim:
+            claimName: lancache-logs

@@ -1,0 +1,5 @@
+resources:
+  - ./pvc/data.pvc.yaml
+  - ./pvc/logs.pvc.yaml
+  - deployment.yaml
+  - service.yaml
