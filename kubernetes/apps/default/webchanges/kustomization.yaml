@@ -1,0 +1,4 @@
+resources:
+  - ./pvc/data.pvc.yaml
+  - configmap.sops.yaml
+  - cronjob.yaml
