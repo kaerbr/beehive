@@ -1,0 +1,60 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: webchanges-job
+  labels:
+    app: webchanges
+spec:
+  schedule: "*/30 * * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          initContainers:
+            - name: install-webchanges
+              image: python:3.14-alpine
+              command: ["/bin/sh", "-c"]
+              # args:
+              #   - python -m venv /opt/venv && /opt/venv/bin/pip install --no-cache-dir webchanges
+              args:
+                - |
+                  [ -f /opt/venv/bin/activate ] || python -m venv /opt/venv
+                  /opt/venv/bin/pip install --upgrade --no-cache-dir webchanges
+              volumeMounts:
+                - name: venv
+                  mountPath: /opt/venv
+
+          containers:
+            - name: webchanges
+              image: python:3.14-alpine
+              command: ["/opt/venv/bin/webchanges"]
+              args:
+                - --urls
+                - /config/urls.yaml
+                - --config
+                - /config/config.yaml
+                - --database
+                - /data/cache.db
+                - --verbose
+              volumeMounts:
+                - name: venv
+                  mountPath: /opt/venv
+                - name: config-volume
+                  mountPath: /config
+                  readOnly: true
+                - name: data
+                  mountPath: /data
+          volumes:
+            - name: venv-volume
+              emptyDir: {}
+            - name: config-volume
+              configMap:
+                name: webchanges-config
+            - name: data
+              persistentVolumeClaim:
+                claimName: webchanges-data
+            - name: venv
+              persistentVolumeClaim:
+                claimName: webchanges-venv
