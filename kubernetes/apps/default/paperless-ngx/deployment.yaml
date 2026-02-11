@@ -59,7 +59,7 @@ spec:
             - mountPath: /backup
               name: backup
         - name: redis
-          image: redis:8.4.0-alpine
+          image: redis:8.6.0-alpine
           ports:
             - name: redis
               containerPort: 6379
