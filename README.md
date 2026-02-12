@@ -8,16 +8,16 @@ A declarative, GitOps-managed Kubernetes homelab running on Talos Linux. All inf
 
 ## 📋 Principles
 
-- Declarative configuration (infrastructure as code)
-- Git as the single source of truth
-- Automated reconciliation (push to main = deployed)
-- Encrypted secrets at rest (never commit plaintext)
+- **Declarative Configuration:** Everything as code (IaC).
+- **GitOps:** Git is the single source of truth for cluster state.
+- **Automated Reconciliation:** Push to `main` = deployed (Flux CD).
+- **Security First:** Encrypted secrets at rest (SOPS) and API-driven OS (Talos).
 
 ## 🖥️ Hardware
 
-| Device         | Role                   | CPU                        | RAM  | Storage    |
-| -------------- | ---------------------- | -------------------------- | ---- | ---------- |
-| Dell Wyse 5070 | Control Plane & Worker | Intel Pentium Silver J5005 | 16GB | 256GB NVMe |
+| Device         | Role                   | CPU                        | RAM  | Storage                                       |
+| -------------- | ---------------------- | -------------------------- | ---- | --------------------------------------------- |
+| Dell Wyse 5070 | Control Plane & Worker | Intel Pentium Silver J5005 | 16GB | 256GB NVMe (ephemeral) <br/> 128GB SATA (storage) |
 
 ## 🏗️ Repository Structure
 
@@ -25,50 +25,29 @@ A declarative, GitOps-managed Kubernetes homelab running on Talos Linux. All inf
 📂 beehive/
 │
 ├── 📂 kubernetes/
-│   ├── flux/config/                            # Flux bootstrap & Kustomizations
-│   │   ├── flux-system/                        # Auto-generated Flux components
-│   │   ├── infrastructure.fluxomization.yaml
-│   │   └── apps.fluxomization.yaml
+│   ├── 📂 flux/config/                         # Flux bootstrap & Kustomizations
+│   │   ├── 📂 flux-system/                     # Auto-generated Flux components
+│   │   ├── apps.fluxomization.yaml             # Apps entry point
+│   │   └── infrastructure.fluxomization.yaml   # Infra entry point
 │   │
-│   ├── infrastructure/
-│   │   ├── crd/                                    # Helm charts (cert-manager, traefik, etc.)
-│   │   └── config/                                 # Configuration CRs (ClusterIssuer, IPAddressPool, etc.)
-│   │                                               # ⚠️ SOPS decryption enabled here
-│   └── apps/
-│       └── <namespace>/<app>/                      # Application deployments
-│           ├── deployment.yaml
-│           └── kustomization.yaml
+│   ├── 📂 infrastructure/
+│   │   ├── 📂 crd/                             # HelmReleases (Traefik, Cert-Manager, etc.)
+│   │   └── 📂 config/                          # Configuration CRs (ClusterIssuers, IP Pools)
+│   │                                           # ⚠️ SOPS decryption enabled here
+│   └── 📂 apps/
+│       ├── 📂 networking/                      # Blocky, Ingress controllers
+│       ├── 📂 monitoring/                      # Prometheus, Grafana
+│       └── 📂 default/                         # Paperless, LanCache, etc.
 │
-├── 📂 talos/                                       # Talos machine configuration
-│   ├── bootstrap-multi-node.sh                     # Automated cluster bootstrap script
-│   ├── secrets.sops.yaml                           # Encrypted Talos cluster secrets
-│   ├── version.yaml                                # Talos Linux version specification
-│   ├── nodes/                                      # Node-specific configurations
-│   │   └── controlplane/                           # Control plane node definitions
-│   │       ├── queen-and-bee-01.yaml               # Physical node config
-│   │       ├── virtualbox-01.yaml                  # Virtual node 1
-│   │       └── virtualbox-02.yaml                  # Virtual node 2
-│   ├── patches/                                    # Configuration patches (all nodes)
-│   │   ├── allow-controlplane-workloads.yaml       # Enable pod scheduling on CP
-│   │   ├── allow-controlplane-loadbalancer.yaml    # Enable loadbalancer scheduling on CP
-│   │   ├── cluster-config.yaml                     # Cluster network settings
-│   │   ├── machine-network-common.yaml             # Common network config
-│   │   ├── metrics-server.yaml                     # Metrics server deployment
-│   │   ├── ntp.yaml                                # NTP time sync
-│   │   └── vip.yaml                                # Virtual IP configuration
-│   └── rendered/                                   # Generated configs (output)
-│       ├── controlplane.yaml                       # Generated CP config
-│       ├── worker.yaml                             # Generated worker config
-│       └── talosconfig                             # Talos API client config
+├── 📂 talos/                                   # Talos machine configuration
+│   ├── bootstrap-multi-node.sh                 # Automated cluster bootstrap script
+│   ├── 📂 nodes/                               # Node-specific configurations
+│   ├── 📂 patches/                             # Shared configuration patches
 │
-├── 📂 .devcontainer/                               # VSCode DevContainer setup
-│   ├── Dockerfile                                  # Alpine + talosctl, sops, age, kustomize
-│   └── devcontainer.json                           # Auto-mounts age key from host
-│
-└── .sops.yaml                                      # SOPS encryption rules
+└── .sops.yaml                                  # SOPS encryption rules
 ```
 
-**Dependency Flow:**
+## ⚙️ Dependency Flow
 
 Flux reconciles resources in strict order:
 
@@ -92,7 +71,6 @@ All secrets are encrypted using **SOPS with age encryption** before committing t
 2. The age key must exist in the cluster as a Kubernetes secret before Flux can decrypt anything.
 3. The sops configuration (containing field matching rules among others) can be found in [.sops.yaml](.sops.yaml).
 
-
 The public age key is committed to the repo. The private key **must** be stored securely:
 - **On your workstation:** `~/.config/sops/age/keys.txt` (or `%USERPROFILE%\.config\sops\age\keys.txt` on Windows)
 - **In the cluster:** As a Kubernetes secret named `sops-age` in the `flux-system` namespace
@@ -103,6 +81,11 @@ The public age key is committed to the repo. The private key **must** be stored 
 # Create/Edit encrypted secret (opens in $EDITOR, (re-)encrypts on close)
 sops kubernetes/apps/default/podinfo/mysupersecret.secret.sops.yaml
 ```
+
+## 🛠️ Maintenance & Automation
+
+- **Renovate:** Automated dependency updates for Helm charts, container images, and even Talos/Kubernetes versions (including the badges in this README!).
+- **Security Scans:** GitHub Actions run periodic scans on the codebase.
 
 ## 🚀 Bootstrap (From Zero to Running Cluster)
 
@@ -136,14 +119,12 @@ The `bootstrap-multi-node.sh` script automates the entire Talos cluster setup pr
 cd talos/
 
 # Bootstrap cluster with control plane nodes
-# Syntax: ./bootstrap-multi-node.sh -c <node_file>:<current_ip> ... [-w <worker_file>:<current_ip> ...] <cluster_name>
-
-# Example 1: Single control plane node (testing/homelab)
+# Example: Single control plane node (testing/homelab)
 ./bootstrap-multi-node.sh \
   -c nodes/controlplane/queen-and-bee-01.yaml:192.168.178.158 \
   beehive
 
-# Example 2: High-availability cluster (3 control planes + 2 workers)
+# Example: High-availability cluster (3 control planes + 2 workers)
 ./bootstrap-multi-node.sh \
   -c nodes/controlplane/queen-and-bee-01.yaml:192.168.178.158 \
   -c nodes/controlplane/virtualbox-01.yaml:192.168.178.159 \
@@ -151,17 +132,6 @@ cd talos/
   -w nodes/worker/worker-01.yaml:192.168.178.161 \
   -w nodes/worker/worker-02.yaml:192.168.178.162 \
   beehive
-
-# The script will:
-# [1/6] Generate Talos configurations (applies all patches)
-# [2/6] Apply configuration to control plane nodes (with confirmation prompts)
-# [3/6] Wait for control plane nodes to initialize (etcd readiness)
-# [4/6] Bootstrap Kubernetes on first control plane
-# [5/6] Apply configuration to worker nodes (if any)
-# [6/6] Generate kubeconfig
-
-# Verify cluster is up
-kubectl get nodes
 ```
 
 **Script Features:**
@@ -180,84 +150,33 @@ kubectl create secret generic sops-age \
   --namespace=flux-system \
   --from-file age.agekey=${HOME}/.config/sops/age/keys.txt
 
-# Bootstrap Flux (replace placeholders)
+# Bootstrap Flux
 flux bootstrap github \
   --owner=<GITHUB_USERNAME> \
   --repository=<REPO_NAME> \
   --branch=main \
   --path=kubernetes/flux/config \
   --personal
-
-# Verify Flux reconciliation
-flux get kustomizations
-flux get helmreleases -A
 ```
 
 ## 🛠️ Daily Operations
 
 ### Add a New Application
 
-```bash
-# 1. Create directory structure
-mkdir -p kubernetes/apps/default/myapp
-
-# 2. Create Kubernetes manifests
-cat <<EOF > kubernetes/apps/default/myapp/deployment.yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: myapp
-  namespace: default
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: myapp
-  template:
-    metadata:
-      labels:
-        app: myapp
-    spec:
-      containers:
-      - name: myapp
-        image: nginx:latest
-        ports:
-        - containerPort: 80
-EOF
-
-# 3. Create Kustomization
-cat <<EOF > kubernetes/apps/default/myapp/kustomization.yaml
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-resources:
-  - deployment.yaml
-EOF
-
-# 4. Commit and push
-git add kubernetes/apps/default/myapp/
-git commit -m "feat(apps): add myapp"
-git push
-
-# 5. Wait for Flux to reconcile (or force it)
-flux reconcile kustomization apps --with-source
-```
+1. Create directory structure: `mkdir -p kubernetes/apps/<namespace>/myapp`
+2. Create manifests (`deployment.yaml`, `service.yaml`, etc.).
+3. Create `kustomization.yaml` in the app directory.
+4. Add the new directory to `kubernetes/apps/<namespace>/kustomization.yaml`.
+5. Commit and push.
+6. Force sync if needed: `flux reconcile kustomization apps --with-source`.
 
 ## 🧰 Development Environment
 
 ### Option 1: Devcontainer (Recommended)
 
-The repository includes a devcontainer with all required tools pre-installed.
-
-```bash
-# 1. Open in VSCode
-code .
-
-# 2. Command Palette (Ctrl+Shift+P): "Dev Containers: Reopen in Container"
-
-# 3. Tools available:
-#    - talosctl, kubectl, flux, sops, age, kustomize, git
-#    - Age key auto-mounted from %USERPROFILE%\.config\sops\age\keys.txt
-```
+The repository includes a devcontainer with all required tools.
+- Open in VSCode → "Reopen in Container".
+- Age key is auto-mounted from your host machine.
 
 ### Option 2: Local Installation
 
