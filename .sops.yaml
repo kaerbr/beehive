@@ -1,23 +1,20 @@
+keys:
+  - &age_key age1ycyh0u3pvt39sucsd3jznl6ut4a4qz09f6wruqrl2565ddwhpd5qhrglw7
+
 stores:
   yaml:
     indent: 2
 
 creation_rules:
-  # Kubernetes Secrets
+  # Kubernetes
   - path_regex: kubernetes/.*\.sops\.ya?ml$
     encrypted_regex: "^(data|stringData)$"
     key_groups:
       - age:
-          - age1ycyh0u3pvt39sucsd3jznl6ut4a4qz09f6wruqrl2565ddwhpd5qhrglw7
-  # Talos secret
+          - *age_key
+  # Talos
   - path_regex: talos/.*\.sops\.ya?ml$
     encrypted_regex: '^(id|secret|bootstraptoken|secretboxencryptionsecret|token|crt|key)$'
     key_groups:
       - age:
-          - age1ycyh0u3pvt39sucsd3jznl6ut4a4qz09f6wruqrl2565ddwhpd5qhrglw7
-  # Blocky Config
-  - path_regex: kubernetes/apps/networking/blocky/.*\.sops\.ya?ml$
-    encrypted_regex: '^(config.yml)$'
-    key_groups:
-      - age:
-          - age1ycyh0u3pvt39sucsd3jznl6ut4a4qz09f6wruqrl2565ddwhpd5qhrglw7
+          - *age_key

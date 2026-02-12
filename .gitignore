@@ -22,7 +22,6 @@
 *.secret.yaml
 
 # Talos specific ignores
-talos/secrets.yaml
 talos/rendered/
 # Talos temporary files
 talos/**/*.tmp
