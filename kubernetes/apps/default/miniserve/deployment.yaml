@@ -17,7 +17,7 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: miniserve
-          image: svenstaro/miniserve:0.32.0-alpine
+          image: svenstaro/miniserve:0.33.0-alpine
           args:
             - /data
             - --upload-files
