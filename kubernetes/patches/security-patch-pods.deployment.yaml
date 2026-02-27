@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: all-deployments # This is a placeholder name
+spec:
+  template:
+    spec:
+      # Pod-level security
+      securityContext:
+        runAsNonRoot: true
+      containers:
+        - name: "*" # This wildcard targets ALL containers in the pod
+          securityContext:
+            allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
