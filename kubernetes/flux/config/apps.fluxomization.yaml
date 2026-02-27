@@ -14,3 +14,7 @@ spec:
     provider: sops
     secretRef:
       name: sops-age
+  patches:
+    - path: ./kubernetes/patches/security-patch-pods.deployment.yaml
+      target:
+        kind: Deployment

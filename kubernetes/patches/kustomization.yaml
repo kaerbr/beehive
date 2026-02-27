@@ -1,0 +1,6 @@
+resources: [] # No resources here, just logic
+
+patches:
+  - path: security-patch-pods.deployment.yaml
+    target:
+      kind: Deployment
