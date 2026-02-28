@@ -20,7 +20,7 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: paperless-ngx
-          image: ghcr.io/paperless-ngx/paperless-ngx:2.20.8
+          image: ghcr.io/paperless-ngx/paperless-ngx:2.20.9
           env:
             - name: PAPERLESS_URL
               value: https://paperless-ngx.beehive.lan64.de
