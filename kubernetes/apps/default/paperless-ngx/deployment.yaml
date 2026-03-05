@@ -58,6 +58,13 @@ spec:
               name: consume
             - mountPath: /backup
               name: backup
+          securityContext:
+            allowPrivilegeEscalation: false
+            # readOnlyRootFilesystem: true
+            privileged: false
+            capabilities:
+              drop:
+                - ALL
         - name: redis
           image: redis:8.6.1-alpine
           ports:
@@ -74,6 +81,13 @@ spec:
           volumeMounts:
             - name: redisdata
               mountPath: /data
+          securityContext:
+            allowPrivilegeEscalation: false
+            # readOnlyRootFilesystem: true
+            privileged: false
+            capabilities:
+              drop:
+                - ALL
       volumes:
         - name: data
           persistentVolumeClaim:
