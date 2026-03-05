@@ -12,6 +12,13 @@ spec:
       labels:
         app: podinfo
     spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      automountServiceAccountToken: false
       containers:
         - name: podinfo
           image: ghcr.io/stefanprodan/podinfo:6.10.2
@@ -24,3 +31,11 @@ spec:
               memory: 100Mi
             limits:
               memory: 100Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            privileged: false
+            capabilities:
+              drop:
+                - ALL
+
