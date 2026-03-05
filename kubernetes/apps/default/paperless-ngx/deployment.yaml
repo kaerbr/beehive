@@ -74,6 +74,13 @@ spec:
           volumeMounts:
             - name: redisdata
               mountPath: /data
+          securityContext:
+            allowPrivilegeEscalation: false
+            # readOnlyRootFilesystem: true
+            privileged: false
+            capabilities:
+              drop:
+                - ALL
       volumes:
         - name: data
           persistentVolumeClaim:

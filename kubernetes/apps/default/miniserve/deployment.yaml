@@ -14,6 +14,13 @@ spec:
       labels:
         app: miniserve
     spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
       automountServiceAccountToken: false
       containers:
         - name: miniserve
@@ -36,12 +43,21 @@ spec:
               mountPath: /data/paperless-ngx/backup
             - name: paperless-ngx-consume
               mountPath: /data/paperless-ngx/consume
+            - name: tmp
+              mountPath: /tmp
           resources:
             requests:
               cpu: 10m
               memory: 100Mi
             limits:
               memory: 100Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            privileged: false
+            capabilities:
+              drop:
+                - ALL
       volumes:
         - name: paperless-ngx-backup
           persistentVolumeClaim:
@@ -49,3 +65,5 @@ spec:
         - name: paperless-ngx-consume
           persistentVolumeClaim:
             claimName: paperless-ngx-consume
+        - name: tmp
+          emptyDir: {}
