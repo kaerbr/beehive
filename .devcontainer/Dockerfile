@@ -1,6 +1,6 @@
 FROM alpine:3.23
 
-ARG TALOS_VERSION=v1.12.4
+ARG TALOS_VERSION=v1.12.5
 ARG FLUX_VERSION=v2.8.1
 
 # Install packages and download tools with checksum verification
