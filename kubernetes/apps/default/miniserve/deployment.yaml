@@ -43,6 +43,8 @@ spec:
               mountPath: /data/paperless-ngx/backup
             - name: paperless-ngx-consume
               mountPath: /data/paperless-ngx/consume
+            - name: nas
+              mountPath: /data/nas
             - name: tmp
               mountPath: /tmp
           resources:
@@ -65,5 +67,8 @@ spec:
         - name: paperless-ngx-consume
           persistentVolumeClaim:
             claimName: paperless-ngx-consume
+        - name: nas
+          persistentVolumeClaim:
+            claimName: nas
         - name: tmp
           emptyDir: {}
