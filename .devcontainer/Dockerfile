@@ -1,7 +1,7 @@
 FROM alpine:3.23
 
 ARG TALOS_VERSION=v1.12.5
-ARG FLUX_VERSION=v2.8.1
+ARG FLUX_VERSION=v2.8.2
 
 # Install packages and download tools with checksum verification
 RUN apk add --no-cache bash grep yq-go nano git age sops kustomize kubectl k9s helm \
