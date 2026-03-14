@@ -21,7 +21,7 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: podinfo
-          image: ghcr.io/stefanprodan/podinfo:6.11.0
+          image: ghcr.io/stefanprodan/podinfo:6.11.1
           ports:
             - containerPort: 9898
               name: http
