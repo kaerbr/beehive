@@ -1,0 +1,17 @@
+config:
+  cache: 10m
+
+servicemonitor:
+  enabled: true
+  interval: 1h
+  labels:
+    release: kube-prometheus-stack
+dashboard:
+  enabled: true
+
+resources:
+  requests:
+    cpu: 30m
+    memory: 20Mi
+  limits:
+    memory: 128Mi
