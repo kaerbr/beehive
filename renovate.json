@@ -14,7 +14,7 @@
   "flux": {
     "managerFilePatterns": [
       "/(?:^|/)gotk-components\\.ya?ml$/",
-      "kubernetes/infrastructure/crd/**/helm.yaml"
+      "kubernetes/apps/**/helm.yaml"
     ]
   },
   "customManagers": [
