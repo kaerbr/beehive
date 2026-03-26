@@ -1,12 +1,3 @@
-# resources:
-#   - helm.yaml
-# configMapGenerator:
-#   - name: speedtest-exporter-helm-values
-#     files:
-#       - values.yaml
-# generatorOptions:
-#   disableNameSuffixHash: true
-
 resources:
   - deployment.yaml
   - service.yaml
