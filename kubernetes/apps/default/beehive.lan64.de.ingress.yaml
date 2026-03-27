@@ -27,6 +27,16 @@ spec:
                 name: paperless-ngx
                 port:
                   name: http
+    - host: paperless-ai.beehive.lan64.de
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: paperless-ai
+                port:
+                  name: http
     - host: miniserve.beehive.lan64.de
       http:
         paths:
