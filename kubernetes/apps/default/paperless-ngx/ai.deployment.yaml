@@ -1,0 +1,105 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: paperless-ai
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: paperless-ai
+  template:
+    metadata:
+      labels:
+        app: paperless-ngx
+        name: paperless-ai
+    spec:
+      enableServiceLinks: false
+      securityContext:
+        # runAsUser: 1000
+        # runAsGroup: 1000
+        # fsGroup: 1000
+        # seccompProfile:
+        #   type: RuntimeDefault
+      automountServiceAccountToken: false
+      containers:
+        - name: paperless-ai
+          image: clusterzx/paperless-ai:3.0.9
+          env:
+            - name: PAPERLESS_API_URL
+              value: http://paperless-ngx.default:8000/api
+            - name: PAPERLESS_API_TOKEN
+              value: 4b62f28caf4c1c328e9b666c558c7742d8b175db
+            - name: PAPERLESS_USERNAME
+              value: admin
+            - name: OLLAMA_API_URL
+              value: http://ollama.default:11434
+            - name: OLLAMA_MODEL
+              value: smollm2:1.7b
+            - name: SYSTEM_PROMPT
+              value: |
+                You are a personalized document analyzer. Your task is to analyze documents and extract relevant information.
+                Analyze the document content and extract the following information into a structured JSON object:
+                1. title: Create a concise, meaningful title for the document
+                2. correspondent: Identify the sender/institution but do not include addresses
+                3. tags: Select up to 4 relevant thematic tags
+                4. document_date: Extract the document date (format: YYYY-MM-DD)
+                5. language: Determine the document language (e.g. "de" or "en")
+
+                Important rules for the analysis:
+
+                For tags:
+                - FIRST check the existing tags before suggesting new ones
+                - Use only relevant categories
+                - Maximum 4 tags per document, less if sufficient (at least 1)
+                - Avoid generic or too specific tags
+                - Use only the most important information for tag creation
+                - The output language is the one used in the document! IMPORTANT!
+
+                For the title:
+                - Short and concise, NO ADDRESSES
+                - Contains the most important identification features
+                - For invoices/orders, mention invoice/order number if available
+                - The output language is the one used in the document! IMPORTANT!
+
+                For the correspondent:
+                - Identify the sender or institution
+                  When generating the correspondent, always create the shortest possible form of the company name (e.g. "Amazon" instead of "Amazon EU SARL, German branch")
+
+                For the document date:
+                - Extract the date of the document
+                - Use the format YYYY-MM-DD
+                - If multiple dates are present, use the most relevant one
+
+                For the language:
+                - Determine the document language
+                - Use language codes like "de" for German or "en" for English
+                - If the language is not clear, use "und" as a placeholder
+            - name: PAPERLESS_AI_INITIAL_SETUP
+              value: "yes"
+            - name: ADD_AI_PROCESSED_TAG
+              value: "yes"
+            - name: AI_PROCESSED_TAG_NAME
+              value: ai-processed
+          ports:
+            - containerPort: 3000
+              name: http
+          volumeMounts:
+            - name: paperless-ai
+              mountPath: /app/data
+          resources:
+            requests:
+              cpu: 10m
+              memory: 100Mi
+            limits:
+              memory: 8Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            # readOnlyRootFilesystem: true
+            privileged: false
+            capabilities:
+              drop:
+                - ALL
+      volumes:
+        - name: paperless-ai
+          persistentVolumeClaim:
+            claimName: paperless-ai
