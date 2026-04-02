@@ -6,3 +6,4 @@ resources:
   - ./webchanges
   # - ./local-ai
   - beehive.lan64.de.ingress.yaml
+  - app-template.ocirepository.yaml

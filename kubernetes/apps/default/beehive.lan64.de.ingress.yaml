@@ -7,16 +7,16 @@ spec:
   tls:
     - secretName: beehive.lan64.de
   rules:
-    - host: podinfo.beehive.lan64.de
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: podinfo
-                port:
-                  name: http
+    # - host: podinfo.beehive.lan64.de
+    #   http:
+    #     paths:
+    #       - path: /
+    #         pathType: Prefix
+    #         backend:
+    #           service:
+    #             name: podinfo
+    #             port:
+    #               name: http
     - host: paperless-ngx.beehive.lan64.de
       http:
         paths:
