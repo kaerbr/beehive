@@ -1,0 +1,81 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta2 # Passe dies an deine Flux-Version an (z.B. v2)
+kind: HelmRelease
+metadata:
+  name: llama-cpp
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: app-template
+  interval: 24h
+  values:
+    controllers:
+      llama-cpp:
+        replicas: 1
+        initContainers:
+          download-model:
+            image:
+              repository: curlimages/curl
+              tag:
+            command: ["/bin/sh", "-c"]
+            args:
+              - |
+                if [ ! -f /models/model.gguf ]; then
+                  echo "Modell nicht gefunden. Starte Download..."
+                  # WICHTIG: Das '-L' Flag (Location) ist zwingend nötig, da Hugging Face beim Download Weiterleitungen (Redirects) nutzt!
+                  curl -L -o /models/modedl.gguf https://huggingface.co/MaziyarPanahi/Llama-3-8B-Instruct-v0.1-GGUF/resolve/main/Llama-3-8B-Instruct-v0.1.Q4_K_M.gguf
+                else
+                  echo "Modell bereits vorhanden. Überspringe Download."
+                fi
+            resources:
+              requests:
+                cpu: 100m
+                memory: 64Mi # Da wir nichts installieren müssen, reicht hier extrem wenig RAM
+              limits:
+                memory: 128Mi
+        containers:
+          llama-cpp:
+            image:
+              repository: ghcr.io/ggerganov/llama.cpp
+              tag: server-b8757
+            args:
+              - --host
+              - 0.0.0.0
+              - --port
+              - "8080"
+              - -m
+              - /models/model.gguf
+              - -c
+              - "16384"
+              - --threads
+              - "4"           # WICHTIG FÜR DEINEN i3: Nutze die Anzahl der physischen Kerne (4), nicht die Threads (8)
+            resources:
+              requests:
+                cpu: 1000m
+                memory: 16Gi
+              limits:
+                memory: 24Gi
+
+    service:
+      llama-cpp:
+        controller: llama-cpp
+        ports:
+          http:
+            port: 8080
+
+    ingress:
+      llama-cpp:
+        className: traefik
+        hosts:
+          - host: llama-cpp.beehive.lan64.de
+            paths:
+              - path: /
+                service:
+                  identifier: llama-cpp
+                  port: http
+
+    persistence:
+      config:
+        enabled: true
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 50Gi
