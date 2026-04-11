@@ -1,0 +1,97 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: llama-cpp
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: app-template
+  interval: 24h
+  values:
+    controllers:
+      llama-cpp:
+        replicas: 1
+        initContainers:
+          download-model:
+            image:
+              repository: curlimages/curl
+              tag: 8.19.0
+            command: ["/bin/sh", "-c"]
+            args:
+              - |
+                MODEL="gemma-4-E4B-it-BF16"
+                FINAL_FILE="/models/${MODEL}.gguf"
+                TMP_FILE="${FINAL_FILE}.tmp"
+
+                # Prüfe, ob die FERTIGE Datei existiert
+                if [ ! -f "$FINAL_FILE" ]; then
+                  echo "Modell nicht gefunden. Starte Download in temporäre Datei..."
+
+                  # Download in die .tmp Datei.
+                  # curl -L -f -o "$TMP_FILE" "https://huggingface.co/unsloth/gemma-4-E2B-it-GGUF/resolve/main/gemma-4-E2B-it-BF16.gguf" && mv "$TMP_FILE" "$FINAL_FILE"
+                  curl -L -f -o "$TMP_FILE" "https://huggingface.co/unsloth/gemma-4-E4B-it-GGUF/resolve/main/gemma-4-E4B-it-BF16.gguf" && mv "$TMP_FILE" "$FINAL_FILE"
+
+                  echo "Download erfolgreich abgeschlossen und Datei umbenannt!"
+                else
+                  echo "Modell bereits vollständig vorhanden. Überspringe Download."
+                fi
+            resources:
+              requests:
+                cpu: 100m
+                memory: 64Mi # Da wir nichts installieren müssen, reicht hier extrem wenig RAM
+              limits:
+                memory: 128Mi
+        containers:
+          llama-cpp:
+            image:
+              repository: ghcr.io/ggml-org/llama.cpp
+              tag: server-b8763
+            args:
+              - --host
+              - 0.0.0.0
+              - --port
+              - "8080"
+              - -c
+              - "16384"
+              - --threads
+              - "4"           # WICHTIG FÜR DEINEN i3: Nutze die Anzahl der physischen Kerne (4), nicht die Threads (8)
+              - -m
+              - /models/gemma-4-E4B-it-BF16.gguf
+              - --temperature
+              - "1.0"
+              - --top-p
+              - "0.95"
+              - --top-k
+              - "64"
+            resources:
+              requests:
+                cpu: 1000m
+                memory: 16Gi
+              limits:
+                memory: 24Gi
+
+    service:
+      llama-cpp:
+        controller: llama-cpp
+        ports:
+          http:
+            port: 8080
+
+    ingress:
+      llama-cpp:
+        className: traefik
+        hosts:
+          - host: llama-cpp.beehive.lan64.de
+            paths:
+              - path: /
+                service:
+                  identifier: llama-cpp
+                  port: http
+
+    persistence:
+      config:
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 50Gi
+        globalMounts:
+          - path: /models
