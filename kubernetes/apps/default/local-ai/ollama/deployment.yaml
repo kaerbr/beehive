@@ -18,7 +18,7 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: ollama
-          image: alpine/ollama:0.20.2
+          image: alpine/ollama:0.20.5
           ports:
             - containerPort: 11434
               name: http
