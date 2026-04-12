@@ -1,3 +1,2 @@
 resources:
-  # - ./ollama
   - ./llama-cpp
