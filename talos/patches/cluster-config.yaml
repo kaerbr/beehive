@@ -5,7 +5,7 @@ cluster:
     # The pod subnet CIDR.
     podSubnets:
       - 10.244.0.0/16
-      - fd00:0:0:1::/64
+      - fd00:0:0:1::/48
     # The service subnet CIDR.
     serviceSubnets:
       - 10.96.0.0/12
