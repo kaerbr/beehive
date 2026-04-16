@@ -71,9 +71,9 @@
     {
       "description": "Group frequent kube-prometheus-stack updates into a single weekly PR and wait 3 days to ensure stability.",
       "matchManagers": ["flux"],
-      "matchPackageNames": ["kube-prometheus-stack"],
+      "matchDepNames": ["kube-prometheus-stack"],
       "minimumReleaseAge": "3 days",
-      "schedule": ["before 5am on Monday"]
+      "schedule": ["before 5am on Tuesday"]
     }
   ]
 }
