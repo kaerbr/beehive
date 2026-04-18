@@ -1,0 +1,92 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: unbound
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: app-template
+  interval: 24h
+  values:
+    controllers:
+      unbound:
+        replicas: 1
+        containers:
+          unbound:
+            image:
+              repository: madnuttah/unbound
+              tag: 1.24.2-2
+            env:
+              TZ: Europe/Berlin
+              DISABLE_SET_PERMS: "true"
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  exec:
+                    command:
+                      - /usr/local/unbound/sbin/healthcheck.sh
+                  initialDelaySeconds: 5
+                  periodSeconds: 60
+                  timeoutSeconds: 15
+                  failureThreshold: 3
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  exec:
+                    command:
+                      - /usr/local/unbound/sbin/healthcheck.sh
+            resources:
+              requests:
+                cpu: 10m
+                memory: 64Mi
+              limits:
+                memory: 256Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              # readOnlyRootFilesystem: true
+              privileged: false
+              capabilities:
+                drop:
+                  - ALL
+        pod:
+          automountServiceAccountToken: false
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+
+    service:
+      unbound:
+        controller: unbound
+        ports:
+          dns-tcp:
+            port: 5335
+            protocol: TCP
+          dns-udp:
+            port: 5335
+            protocol: UDP
+
+    configMaps:
+      dns-config:
+        suffix: dns-config
+        data:
+          private-domains.conf: |
+            server:
+                private-domain: "lan64.de"
+
+    persistence:
+      dns-config:
+        type: configMap
+        name: unbound-dns-config
+        globalMounts:
+          - path: /usr/local/unbound/conf.d/private-domains.conf
+            subPath: private-domains.conf
+            readOnly: true
