@@ -4,9 +4,9 @@ resources:
   - ./pvc/data.pvc.yaml
   - ./pvc/media.pvc.yaml
   - ./pvc/redisdata.pvc.yaml
-  - ./pvc/ai.pvc.yaml
+  # - ./pvc/ai.pvc.yaml
   - secret.sops.yaml
   - deployment.yaml
   - service.yaml
-  - ai.deployment.yaml
-  - ai.service.yaml
+  # - ai.deployment.yaml
+  # - ai.service.yaml
