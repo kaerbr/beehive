@@ -2,14 +2,15 @@
 machine:
   install:
     disk: /dev/sda
+    image: factory.talos.dev/metal-installer/4b3cd373a192c8469e859b7a0cfbed3ecc3577c4a2d346a37b0aeff9cd17cdb0:v1.12.6
 
   # Configures the node labels for the machine.
   nodeLabels:
     beehive.lan64.de/model: Wyse-5070
     beehive.lan64.de/cpu: Pentium-J5005
     beehive.lan64.de/memory: 16GB
-    beehive.lan64.de/ephemeral: 256GB
-    beehive.lan64.de/storage: 128GB
+    beehive.lan64.de/ephemeral: 50GB
+    beehive.lan64.de/storage: 200GB
 ---
 apiVersion: v1alpha1
 kind: LinkAliasConfig
@@ -30,9 +31,21 @@ hostname: queen-and-bee-01
 auto: off
 ---
 apiVersion: v1alpha1
-kind: UserVolumeConfig
-name: local-path-provisioner
-volumeType: disk
+kind: VolumeConfig
+name: EPHEMERAL
 provisioning:
   diskSelector:
-    match: disk.transport == 'nvme'
+    match: disk.transport == 'sata'
+  minSize: 2GB
+  maxSize: 50GB
+  grow: false
+---
+apiVersion: v1alpha1
+kind: UserVolumeConfig
+name: local-path-provisioner
+volumeType: partition
+provisioning:
+  diskSelector:
+    match: disk.transport == 'sata'
+  minSize: 2GB
+  grow: true

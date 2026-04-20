@@ -23,12 +23,12 @@
       "customType": "regex",
       "description": "Update Talos version in version file, README badge and Dockerfile",
       "managerFilePatterns": [
-        "talos/version.yaml",
+        "talos/nodes/**/*.yaml",
         "README.md",
         ".devcontainer/Dockerfile"
       ],
       "matchStrings": [
-        "version: (?<currentValue>v[\\d.]+)",
+        "machine:\\s+install:\\s+.*?image: .+:(?<currentValue>v[\\d.]+)",
         "badge/Talos-(?<currentValue>v[\\d.]+)-",
         "ARG TALOS_VERSION=(?<currentValue>v[\\d.]+)"
       ],
