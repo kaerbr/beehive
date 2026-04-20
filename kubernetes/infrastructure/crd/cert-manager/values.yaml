@@ -1,2 +1,5 @@
 crds:
   enabled: true
+
+# Serialize ACME challenges to avoid hammering rate-limited DNS APIs (e.g. ipv64: 64 calls/24h)
+maxConcurrentChallenges: 1
