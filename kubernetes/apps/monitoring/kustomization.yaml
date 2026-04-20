@@ -1,5 +1,5 @@
 namespace: monitoring
 resources:
   - namespace.yaml
-  - ./kube-prometheus-stack
-  - ./speedtest-exporter
+  # - ./kube-prometheus-stack
+  # - ./speedtest-exporter
