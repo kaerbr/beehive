@@ -28,7 +28,7 @@
         ".devcontainer/Dockerfile"
       ],
       "matchStrings": [
-        "machine:\\s+install:\\s+.*?image: .+:(?<currentValue>v[\\d.]+)",
+        "(?s)machine:\\s+install:\\s+.*?image: .+:(?<currentValue>v[\\d.]+)",
         "badge/Talos-(?<currentValue>v[\\d.]+)-",
         "ARG TALOS_VERSION=(?<currentValue>v[\\d.]+)"
       ],
