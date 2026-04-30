@@ -59,6 +59,16 @@
       ],
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "fluxcd/flux2"
+    },
+    {
+      "customType": "regex",
+      "description": "Custom manager for bjw-s app-template style",
+      "managerFilePatterns": [
+        "kubernetes/**/*.yaml",
+        "!kubernetes/flux/**/*.yaml"
+      ],
+      "matchStrings": ["repository:\\s+(?<depName>[^\\s\"']+)\\s+tag:\\s+(?<currentValue>[^\\s\"']+)"],
+      "datasourceTemplate": "docker"
     }
   ],
   "packageRules": [
