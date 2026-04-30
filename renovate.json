@@ -84,6 +84,11 @@
       "matchDepNames": ["kube-prometheus-stack"],
       "minimumReleaseAge": "3 days",
       "schedule": ["before 5am on Tuesday"]
+    },
+    {
+      "description": "Custom versioning scheme for madnuttah/unbound",
+      "matchDepNames": ["madnuttah/unbound"],
+      "versioning": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-(?<build>\\d+)$"
     }
   ]
 }
