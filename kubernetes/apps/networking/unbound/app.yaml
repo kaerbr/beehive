@@ -17,7 +17,7 @@ spec:
           unbound:
             image:
               repository: madnuttah/unbound
-              tag: 1.24.2-2
+              tag: 1.25.0-0
             env:
               TZ: Europe/Berlin
               DISABLE_SET_PERMS: "true"
