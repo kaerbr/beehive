@@ -17,7 +17,7 @@ spec:
           podinfo:
             image:
               repository: ghcr.io/stefanprodan/podinfo
-              tag: 6.7.0
+              tag: 6.11.2
             env:
               PODINFO_UI_COLOR: "#70044e"
             resources:
