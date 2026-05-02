@@ -56,13 +56,13 @@ spec:
               - -c
               - "16384"
               - -hf
-              - unsloth/SmolLM2-360M-Instruct-GGUF:Q8_0
-              - --temperature
-              - "1.0"
-              - --top-p
-              - "0.95"
-              - --top-k
-              - "64"
+              - unsloth/SmolLM2-360M-Instruct-GGUF:F16
+              # - --temperature
+              # - "1.0"
+              # - --top-p
+              # - "0.95"
+              # - --top-k
+              # - "64"
               - --jinja
             resources:
               requests:
