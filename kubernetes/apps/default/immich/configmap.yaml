@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: immich-config
+data:
+  immich.json: |
+    {
+      "machineLearning": {
+        "urls": ["http://localhost:3003"]
+      },
+    }

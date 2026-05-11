@@ -1,0 +1,180 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: immich
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: app-template
+  interval: 24h
+  values:
+    controllers:
+      immich:
+        replicas: 1
+        containers:
+          database:
+            image:
+              repository: ghcr.io/immich-app/postgres
+              tag: 16-vectorchord0.4.3-pgvectors0.2.0
+            env:
+              POSTGRES_USER: &dbUser immich
+              POSTGRES_DB: &dbName immich
+              POSTGRES_PASSWORD: &dbPassword Immich123!()
+              POSTGRES_INITDB_ARGS: --data-checksums
+            resources:
+              requests:
+                cpu: 100m
+                memory: 250Mi
+              limits:
+                memory: 2Gi
+
+          server:
+            image:
+              repository: ghcr.io/immich-app/immich-server
+              tag: v2.7.5
+            env:
+              REDIS_HOSTNAME: localhost
+              DB_HOSTNAME: localhost
+              DB_USERNAME: *dbUser
+              DB_DATABASE_NAME: *dbName
+              DB_PASSWORD: *dbPassword
+              IMMICH_CONFIG_FILE: /config/immich.json
+            resources:
+              requests:
+                cpu: 100m
+                memory: 250Mi
+              limits:
+                memory: 8Gi
+            dependsOn:
+              - redis
+              - database
+
+          machine-learning:
+            image:
+              repository: ghcr.io/immich-app/immich-machine-learning
+              tag: v2.7.5
+            resources:
+              requests:
+                cpu: 100m
+                memory: 250Mi
+              limits:
+                memory: 2Gi
+
+          redis:
+            image:
+              repository: docker.io/valkey/valkey
+              tag: 9.0.4-alpine
+            resources:
+              requests:
+                cpu: 100m
+                memory: 250Mi
+              limits:
+                memory: 2Gi
+            probes:
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  exec:
+                    command:
+                      - redis-cli
+                      - ping
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  exec:
+                    command:
+                      - redis-cli
+                      - ping
+
+          filen-sync:
+            image:
+              repository: debian
+              tag: latest
+            command:
+              - /bin/bash
+              - -c
+              - sleep 3600
+            resources:
+              requests:
+                cpu: 50m
+                memory: 128Mi
+              limits:
+                memory: 4Gi
+
+    # 2. Service/Ingress
+    service:
+      main:
+        controller: immich
+        ports:
+          http:
+            port: 2283
+
+    ingress:
+      main:
+        className: traefik
+        hosts:
+          - host: immich.beehive.lan64.de
+            paths:
+              - path: /
+                service:
+                  identifier: main
+                  port: http
+
+    # 3. Persistence (Storage)
+    persistence:
+      config:
+        type: configMap
+        name: immich-config
+        advancedMounts:
+          immich:
+            server:
+              - path: /config
+                readOnly: true
+
+      # The main Immich upload folder (Internal) - Only for Server
+      library:
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 5Gi
+        advancedMounts:
+          immich:
+            server:
+              - path: /data
+
+      # YOUR EXTERNAL LIBRARY - Only for Server (and ML if you want OCR on external files)
+      external:
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 100Gi
+        advancedMounts:
+          immich:
+            server:
+              - path: /external/photos
+                readOnly: true
+            machine-learning:
+              - path: /external/photos
+                readOnly: true
+            filen-sync:
+              - path: /external/photos
+
+      # Postgres Data - Only for Database
+      database:
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 10Gi
+        advancedMounts:
+          immich:
+            database:
+              - path: /var/lib/postgresql/data
+
+      # Machine Learning Model Cache - Only for Machine Learning
+      model-cache:
+        type: emptyDir
+        advancedMounts:
+          immich:
+            machine-learning:
+              - path: /cache
