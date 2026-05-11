@@ -1,0 +1,111 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: immich
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: app-template
+  interval: 24h
+  values:
+    controllers:
+      immich:
+        replicas: 1
+        containers:
+          server:
+            image:
+              repository: ghcr.io/immich-app/immich-server
+              tag: &immichVersion v2.7.5
+            env:
+              IMMICH_MACHINE_LEARNING_URL: http://localhost:3003
+              REDIS_HOSTNAME: localhost # Since we use sidecars for Redis/DB in this example
+              DB_HOSTNAME: localhost
+              DB_USERNAME: &dbUser immich
+              DB_DATABASE_NAME: &dbName immich
+              # Use a Secret for these in production!
+              DB_PASSWORD: "your_password"
+            resources:
+              requests:
+                cpu: 100m
+                memory: 250Mi
+              limits:
+                memory: 1Gi
+
+          machine-learning:
+            image:
+              repository: ghcr.io/immich-app/immich-machine-learning
+              tag: *immichVersion
+            env:
+              TRANSFORMERS_CACHE: /cache
+
+          redis:
+            image:
+              repository: docker.io/valkey/valkey
+              tag: 9
+            # healthcheck:
+            #   test: ["CMD", "redis-cli", "ping"]
+
+          database:
+            image:
+              repository: ghcr.io/immich-app/postgres
+              tag: 14-vectorchord0.4.3-pgvectors0.2.0
+            env:
+              POSTGRES_USER: *dbUser
+              POSTGRES_DB: *dbName
+              POSTGRES_PASSWORD: "your_password"
+              POSTGRES_INITDB_ARGS: "--data-checksums"
+
+    # 2. Service/Ingress
+    service:
+      main:
+        controller: immich
+        ports:
+          http:
+            port: 2283
+
+    ingress:
+      main:
+        className: traefik
+        hosts:
+          - host: immich.beehive.lan64.de
+            paths:
+              - path: /
+                service:
+                  identifier: main
+                  port: http
+
+    # 3. Persistence (Storage)
+    persistence:
+      # The main Immich upload folder (Internal)
+      library:
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 5Gi
+        globalMounts:
+          - path: /data
+
+      # YOUR EXTERNAL LIBRARY (Filen Mount via Rclone CSI)
+      # For now, mapping a hostPath for your test
+      external:
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 5Gi
+        globalMounts:
+          - path: /external/photos
+            readOnly: true
+
+      # Postgres Data
+      database:
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 10Gi
+        globalMounts:
+          - path: /var/lib/postgresql/data
+
+      # Machine Learning Model Cache
+      model-cache:
+        type: emptyDir
+        globalMounts:
+          - path: /cache

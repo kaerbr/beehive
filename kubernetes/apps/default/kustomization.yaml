@@ -4,6 +4,7 @@ resources:
   - ./paperless-ngx
   - ./miniserve
   - ./webchanges
+  - ./immich
   # - ./local-ai
   # - ./n8n
   - beehive.lan64.de.ingress.yaml
