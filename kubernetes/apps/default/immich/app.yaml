@@ -11,7 +11,7 @@ spec:
   interval: 24h
   values:
     controllers:
-      immich:
+      immich-db:
         replicas: 1
         containers:
           database:
@@ -23,38 +23,6 @@ spec:
               POSTGRES_DB: &dbName immich
               POSTGRES_PASSWORD: &dbPassword Immich123!()
               POSTGRES_INITDB_ARGS: --data-checksums
-            resources:
-              requests:
-                cpu: 100m
-                memory: 250Mi
-              limits:
-                memory: 2Gi
-
-          server:
-            image:
-              repository: ghcr.io/immich-app/immich-server
-              tag: v2.7.5
-            env:
-              REDIS_HOSTNAME: localhost
-              DB_HOSTNAME: localhost
-              DB_USERNAME: *dbUser
-              DB_DATABASE_NAME: *dbName
-              DB_PASSWORD: *dbPassword
-              IMMICH_CONFIG_FILE: /config/immich.json
-            resources:
-              requests:
-                cpu: 100m
-                memory: 250Mi
-              limits:
-                memory: 8Gi
-            dependsOn:
-              - redis
-              - database
-
-          machine-learning:
-            image:
-              repository: ghcr.io/immich-app/immich-machine-learning
-              tag: v2.7.5
             resources:
               requests:
                 cpu: 100m
@@ -90,6 +58,42 @@ spec:
                       - redis-cli
                       - ping
 
+      immich-server:
+        replicas: 1
+        containers:
+          server:
+            image:
+              repository: ghcr.io/immich-app/immich-server
+              tag: v2.7.5
+            env:
+              REDIS_HOSTNAME: immich-db
+              DB_HOSTNAME: immich-db
+              DB_USERNAME: *dbUser
+              DB_DATABASE_NAME: *dbName
+              DB_PASSWORD: *dbPassword
+              TZ: Europe/Berlin
+              IMMICH_CONFIG_FILE: /config/immich.json
+            resources:
+              requests:
+                cpu: 100m
+                memory: 250Mi
+              limits:
+                memory: 8Gi
+
+          machine-learning:
+            image:
+              repository: ghcr.io/immich-app/immich-machine-learning
+              tag: v2.7.5
+            resources:
+              requests:
+                cpu: 100m
+                memory: 250Mi
+              limits:
+                memory: 2Gi
+
+      immich-sync:
+        replicas: 0
+        containers:
           filen-sync:
             image:
               repository: debian
@@ -107,21 +111,28 @@ spec:
 
     # 2. Service/Ingress
     service:
-      main:
-        controller: immich
+      server:
+        controller: immich-server
         ports:
           http:
             port: 2283
+      db:
+        controller: immich-db
+        ports:
+          postgres:
+            port: 5432
+          redis:
+            port: 6379
 
     ingress:
-      main:
+      server:
         className: traefik
         hosts:
           - host: immich.beehive.lan64.de
             paths:
               - path: /
                 service:
-                  identifier: main
+                  identifier: server
                   port: http
 
     # 3. Persistence (Storage)
@@ -130,7 +141,7 @@ spec:
         type: configMap
         name: immich-config
         advancedMounts:
-          immich:
+          immich-server:
             server:
               - path: /config
                 readOnly: true
@@ -141,7 +152,7 @@ spec:
         accessMode: ReadWriteOnce
         size: 25Gi
         advancedMounts:
-          immich:
+          immich-server:
             server:
               - path: /data
 
@@ -151,13 +162,14 @@ spec:
         accessMode: ReadWriteOnce
         size: 100Gi
         advancedMounts:
-          immich:
+          immich-server:
             server:
               - path: /external/photos
                 readOnly: true
             machine-learning:
               - path: /external/photos
                 readOnly: true
+          immich-sync:
             filen-sync:
               - path: /external/photos
 
@@ -167,7 +179,7 @@ spec:
         accessMode: ReadWriteOnce
         size: 10Gi
         advancedMounts:
-          immich:
+          immich-db:
             database:
               - path: /var/lib/postgresql/data
 
@@ -175,6 +187,19 @@ spec:
       model-cache:
         type: emptyDir
         advancedMounts:
-          immich:
+          immich-server:
             machine-learning:
               - path: /cache
+
+      # One single PVC for everything Filen-related
+      filen-data:
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 5Gi
+        advancedMounts:
+          immich-sync:
+            filen-sync:
+              - path: /root/.filen
+                subPath: config
+              - path: /usr/local/bin
+                subPath: bin
