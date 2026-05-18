@@ -92,22 +92,27 @@ spec:
                 memory: 2Gi
 
       immich-sync:
-        replicas: 0
+        type: cronjob
+        cronjob:
+          schedule: "@hourly"
         containers:
           filen-sync:
             image:
-              repository: debian
-              tag: latest
-            command:
-              - /bin/bash
-              - -c
-              - sleep 3600
+              repository: ghcr.io/kaerbr/shipyard/filen-cli
+              tag: 0.0.36
+            args:
+              - sync
+              - /external/photos:cloudToLocal:/Bilder
+              - --verbose
             resources:
               requests:
                 cpu: 50m
                 memory: 128Mi
               limits:
-                memory: 4Gi
+                memory: 8Gi
+            envFrom:
+              - secretRef:
+                  name: filen-cli
 
     # 2. Service/Ingress
     service:
@@ -190,16 +195,3 @@ spec:
           immich-server:
             machine-learning:
               - path: /cache
-
-      # One single PVC for everything Filen-related
-      filen-data:
-        type: persistentVolumeClaim
-        accessMode: ReadWriteOnce
-        size: 5Gi
-        advancedMounts:
-          immich-sync:
-            filen-sync:
-              - path: /root/.filen
-                subPath: config
-              - path: /usr/local/bin
-                subPath: bin
