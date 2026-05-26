@@ -8,6 +8,7 @@
     "kaerbr"
   ],
   "minimumReleaseAge": "3 days",
+  "minimumReleaseAgeBehaviour": "timestamp-optional",
   "kubernetes": {
     "managerFilePatterns": [
       "kubernetes/apps/**/!(kustomization).yaml"
