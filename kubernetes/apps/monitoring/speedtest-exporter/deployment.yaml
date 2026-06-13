@@ -15,7 +15,7 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: speedtest-exporter
-          image: ghcr.io/heathcliff26/speedtest-exporter:v1.6.0
+          image: ghcr.io/heathcliff26/speedtest-exporter:v1.6.1
           ports:
             - containerPort: 8080
               name: metrics
