@@ -45,7 +45,7 @@ spec:
           llama-cpp:
             image:
               repository: ghcr.io/ggml-org/llama.cpp
-              tag: server-b8982
+              tag: server-b10068
             args:
               - --host
               - 0.0.0.0
@@ -54,16 +54,18 @@ spec:
               - --threads
               - "4"
               - -c
-              - "16384"
+              - "4096"
               - -hf
-              - unsloth/SmolLM2-360M-Instruct-GGUF:F16
-              # - --temperature
-              # - "1.0"
-              # - --top-p
-              # - "0.95"
-              # - --top-k
-              # - "64"
+              - unsloth/gemma-4-E2B-it-GGUF:Q4_K_M
+              - --temperature
+              - "1.0"
+              - --top-p
+              - "0.95"
+              - --top-k
+              - "64"
               - --jinja
+              - --chat-template-kwargs
+              - '{"enable_thinking":false}'
             resources:
               requests:
                 cpu: 1000m
