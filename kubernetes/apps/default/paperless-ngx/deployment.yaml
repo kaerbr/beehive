@@ -20,10 +20,15 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: paperless-ngx
-          image: ghcr.io/paperless-ngx/paperless-ngx:2.20.15
+          image: ghcr.io/paperless-ngx/paperless-ngx:3.0.3
           env:
             - name: PAPERLESS_URL
               value: https://paperless-ngx.beehive.lan64.de
+            - name: PAPERLESS_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: paperless-ngx
+                  key: PAPERLESS_SECRET_KEY
             - name: PAPERLESS_ADMIN_USER
               valueFrom:
                 secretKeyRef:
