@@ -77,20 +77,3 @@ spec:
           dns-udp:
             port: 5335
             protocol: UDP
-
-    configMaps:
-      dns-config:
-        suffix: dns-config
-        data:
-          private-domains.conf: |
-            server:
-                private-domain: "lan64.de"
-
-    persistence:
-      dns-config:
-        type: configMap
-        name: unbound-dns-config
-        globalMounts:
-          - path: /usr/local/unbound/conf.d/private-domains.conf
-            subPath: private-domains.conf
-            readOnly: true
