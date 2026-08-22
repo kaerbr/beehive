@@ -1,6 +1,6 @@
 # Beehive 🐝
 
-[![Talos](https://img.shields.io/badge/Talos-v1.13.8-FF7300?logo=talos&logoColor=FF7300&labelColor=1a1a1a&style=for-the-badge)](https://talos.dev)&emsp;
+[![Talos](https://img.shields.io/badge/Talos-v1.13.9-FF7300?logo=talos&logoColor=FF7300&labelColor=1a1a1a&style=for-the-badge)](https://talos.dev)&emsp;
 [![Kubernetes](https://img.shields.io/badge/Kubernetes-v1.36.3-326CE5?logo=kubernetes&logoColor=326CE5&labelColor=1a1a1a&style=for-the-badge)](https://kubernetes.io)&emsp;
 [![Flux](https://img.shields.io/badge/Flux-v2.9.4-5468FF?logo=flux&logoColor=5468FF&labelColor=1a1a1a&style=for-the-badge)](https://fluxcd.io)
 
