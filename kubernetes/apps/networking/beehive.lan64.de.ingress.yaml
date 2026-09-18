@@ -4,8 +4,6 @@ metadata:
   name: beehive
 spec:
   ingressClassName: traefik
-  tls:
-    - secretName: beehive.lan64.de
   rules:
     - host: blocky.beehive.lan64.de
       http:

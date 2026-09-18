@@ -1,0 +1,10 @@
+# Traefik serves this as the default certificate on every websecure router,
+# so Ingresses need no tls: block of their own. Only a store named "default"
+# is honoured, and it must sit in the same namespace as the secret.
+apiVersion: traefik.io/v1alpha1
+kind: TLSStore
+metadata:
+  name: default
+spec:
+  defaultCertificate:
+    secretName: beehive.lan64.de

@@ -10,8 +10,6 @@ grafana:
     ingressClassName: traefik
     hosts:
       - grafana.beehive.lan64.de
-    tls:
-      - secretName: beehive.lan64.de
 
 prometheus:
   prometheusSpec:

@@ -1,0 +1,11 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: beehive.lan64.de
+spec:
+  secretName: beehive.lan64.de
+  issuerRef:
+    name: ipv64
+    kind: ClusterIssuer
+  dnsNames:
+    - "*.beehive.lan64.de"
