@@ -5,12 +5,10 @@ metadata:
   namespace: default
 spec:
   secretName: beehive.lan64.de
-  commonName: beehive.lan64.de
   issuerRef:
     name: ipv64
     kind: ClusterIssuer
   dnsNames:
-    - beehive.lan64.de
     - "*.beehive.lan64.de"
 ---
 apiVersion: cert-manager.io/v1
@@ -20,12 +18,10 @@ metadata:
   namespace: monitoring
 spec:
   secretName: beehive.lan64.de
-  commonName: beehive.lan64.de
   issuerRef:
     name: ipv64
     kind: ClusterIssuer
   dnsNames:
-    - beehive.lan64.de
     - "*.beehive.lan64.de"
 ---
 apiVersion: cert-manager.io/v1
@@ -35,10 +31,8 @@ metadata:
   namespace: networking
 spec:
   secretName: beehive.lan64.de
-  commonName: beehive.lan64.de
   issuerRef:
     name: ipv64
     kind: ClusterIssuer
   dnsNames:
-    - beehive.lan64.de
     - "*.beehive.lan64.de"
