@@ -15,9 +15,9 @@ A declarative, GitOps-managed Kubernetes homelab running on Talos Linux. All inf
 
 ## 🖥️ Hardware
 
-| Device         | Role                   | CPU                        | RAM  | Storage                                       |
-| -------------- | ---------------------- | -------------------------- | ---- | --------------------------------------------- |
-| Dell Wyse 5070 | Control Plane & Worker | Intel Pentium Silver J5005 | 16GB | 256GB NVMe (ephemeral) <br/> 128GB SATA (storage) |
+| Device         | Role                   | CPU                        | RAM  | Storage                          |
+| -------------- | ---------------------- | -------------------------- | ---- | -------------------------------- |
+| Dell Wyse 5070 | Control Plane & Worker | Intel Pentium Silver J5005 | 16GB | 256GB SATA (ephemeral & storage) |
 
 ## 🏗️ Repository Structure
 
