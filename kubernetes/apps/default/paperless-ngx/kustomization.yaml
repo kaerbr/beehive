@@ -8,5 +8,6 @@ resources:
   - secret.sops.yaml
   - deployment.yaml
   - service.yaml
+  - backup.cronjob.yaml
   # - ai.deployment.yaml
   # - ai.service.yaml
