@@ -134,13 +134,13 @@ echo ""
 echo "[1/6] Generating Talos configurations..."
 talosctl gen config "${CLUSTER_NAME}" "https://${VIP}:6443" \
   --with-secrets <(sops -d secrets.sops.yaml) \
-  --config-patch patches/allow-controlplane-loadbalancer.yaml \
-  --config-patch @patches/allow-controlplane-workloads.yaml \
   --config-patch @patches/cluster-config.yaml \
   --config-patch @patches/machine-network-common.yaml \
   --config-patch @patches/metrics-server.yaml \
   --config-patch @patches/ntp.yaml \
   --config-patch-control-plane @patches/vip.yaml \
+  --config-patch-control-plane @patches/allow-controlplane-workloads.yaml \
+  --config-patch-control-plane @patches/allow-controlplane-loadbalancer.yaml \
   --output rendered/
 
 echo "✓ Configurations generated (controlplane.yaml, worker.yaml)"

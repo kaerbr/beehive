@@ -1,16 +1,20 @@
 ---
-machine:
-  install:
-    disk: /dev/sda
-    image: factory.talos.dev/metal-installer/4b3cd373a192c8469e859b7a0cfbed3ecc3577c4a2d346a37b0aeff9cd17cdb0:v1.14.1
-
-  # Configures the node labels for the machine.
-  nodeLabels:
-    beehive.lan64.de/model: Wyse-5070
-    beehive.lan64.de/cpu: Pentium-J5005
-    beehive.lan64.de/memory: 16GB
-    beehive.lan64.de/ephemeral: 50GB
-    beehive.lan64.de/storage: 200GB
+apiVersion: v1alpha1
+kind: UnattendedInstallConfig
+installer:
+  image: factory.talos.dev/metal-installer/4b3cd373a192c8469e859b7a0cfbed3ecc3577c4a2d346a37b0aeff9cd17cdb0:v1.14.1
+provisioning:
+  diskSelector:
+    match: disk.transport == 'sata'
+---
+apiVersion: v1alpha1
+kind: KubeNodeConfig
+labels:
+  beehive.lan64.de/model: Wyse-5070
+  beehive.lan64.de/cpu: Pentium-J5005
+  beehive.lan64.de/memory: 32GB
+  beehive.lan64.de/ephemeral: 50GB
+  beehive.lan64.de/storage: 200GB
 ---
 apiVersion: v1alpha1
 kind: LinkAliasConfig
@@ -23,7 +27,7 @@ kind: LinkConfig
 name: net0
 addresses:
   - address: 192.168.178.11/24
-  - address: fd00::11/16
+  - address: fd00::11/64
 ---
 apiVersion: v1alpha1
 kind: HostnameConfig
