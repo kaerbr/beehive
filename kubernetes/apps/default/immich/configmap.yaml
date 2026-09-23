@@ -7,5 +7,5 @@ data:
     {
       "machineLearning": {
         "urls": ["http://localhost:3003"]
-      },
+      }
     }

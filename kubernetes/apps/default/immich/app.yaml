@@ -11,7 +11,7 @@ spec:
   interval: 24h
   values:
     controllers:
-      immich-db:
+      db:
         replicas: 1
         containers:
           database:
@@ -58,7 +58,7 @@ spec:
                       - redis-cli
                       - ping
 
-      immich-server:
+      server:
         replicas: 1
         containers:
           server:
@@ -91,7 +91,7 @@ spec:
               limits:
                 memory: 2Gi
 
-      immich-sync:
+      sync:
         type: cronjob
         cronjob:
           schedule: "@hourly"
@@ -114,15 +114,37 @@ spec:
               - secretRef:
                   name: filen-cli
 
+      backup:
+        type: cronjob
+        cronjob:
+          schedule: "30 2 * * *"
+          concurrencyPolicy: Forbid
+          backoffLimit: 2
+        pod:
+          automountServiceAccountToken: false
+          restartPolicy: OnFailure
+        containers:
+          upload:
+            image:
+              repository: ghcr.io/kaerbr/shipyard/filen-cli
+              tag: 0.0.36
+            args:
+              - sync
+              - /data/backups:localToCloud:/Backups/beehive/immich
+              - --verbose
+            envFrom:
+              - secretRef:
+                  name: filen-cli
+
     # 2. Service/Ingress
     service:
       server:
-        controller: immich-server
+        controller: server
         ports:
           http:
             port: 2283
       db:
-        controller: immich-db
+        controller: db
         ports:
           postgres:
             port: 5432
@@ -146,7 +168,7 @@ spec:
         type: configMap
         name: immich-config
         advancedMounts:
-          immich-server:
+          server:
             server:
               - path: /config
                 readOnly: true
@@ -157,8 +179,11 @@ spec:
         accessMode: ReadWriteOnce
         size: 25Gi
         advancedMounts:
-          immich-server:
+          server:
             server:
+              - path: /data
+          backup:
+            upload:
               - path: /data
 
       # YOUR EXTERNAL LIBRARY - Only for Server (and ML if you want OCR on external files)
@@ -167,14 +192,14 @@ spec:
         accessMode: ReadWriteOnce
         size: 100Gi
         advancedMounts:
-          immich-server:
+          server:
             server:
               - path: /external/photos
                 readOnly: true
             machine-learning:
               - path: /external/photos
                 readOnly: true
-          immich-sync:
+          sync:
             filen-sync:
               - path: /external/photos
 
@@ -184,7 +209,7 @@ spec:
         accessMode: ReadWriteOnce
         size: 10Gi
         advancedMounts:
-          immich-db:
+          db:
             database:
               - path: /var/lib/postgresql/data
 
@@ -192,6 +217,6 @@ spec:
       model-cache:
         type: emptyDir
         advancedMounts:
-          immich-server:
+          server:
             machine-learning:
               - path: /cache
