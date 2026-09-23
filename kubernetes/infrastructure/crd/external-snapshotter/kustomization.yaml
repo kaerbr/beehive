@@ -1,0 +1,21 @@
+# infrastructure/crd/external-snapshotter/kustomization.yaml
+resources:
+  - github.com/kubernetes-csi/external-snapshotter/client/config/crd?ref=v8.6.0
+  - github.com/kubernetes-csi/external-snapshotter/deploy/kubernetes/snapshot-controller?ref=v8.6.0
+patches:
+  - target: {kind: Deployment, name: snapshot-controller}
+    patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/args/-
+        value: --enable-distributed-snapshotting=true
+      - op: replace
+        path: /spec/replicas
+        value: 1              # Single-Node, 2 Replicas bringen nichts
+  - target: {kind: ClusterRole, name: snapshot-controller-runner}
+    patch: |-
+      - op: add
+        path: /rules/-
+        value:
+          apiGroups: [""]
+          resources: ["nodes"]
+          verbs: ["get", "list", "watch"]

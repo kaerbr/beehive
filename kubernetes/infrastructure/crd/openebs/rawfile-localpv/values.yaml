@@ -1,0 +1,27 @@
+analytics:
+  enabled: false
+
+node:
+  metadataDirPath: /var/mnt/local-path-provisioner/rawfile-meta
+  storagePools:
+    default:
+      path: /var/mnt/local-path-provisioner/rawfile
+  snapshotController:
+    enabled: false # kommt aus infrastructure/crd/external-snapshotter
+
+# workaround für bug in helm chart
+snapshotClasses: []
+
+crds:
+  enabled: false
+
+# storageClasses:
+#   - name: rawfile-localpv
+#     enabled: true
+#     isDefault: true          # true, sobald du von local-path umstellst
+#     volumeBindingMode: WaitForFirstConsumer
+#     allowVolumeExpansion: true
+#     reclaimPolicy: Delete
+#     storagePool: default
+#     copyOnWrite: true
+#     freezeFs: false
