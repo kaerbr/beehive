@@ -15,13 +15,13 @@ snapshotClasses: []
 crds:
   enabled: false
 
-# storageClasses:
-#   - name: rawfile-localpv
-#     enabled: true
-#     isDefault: true          # true, sobald du von local-path umstellst
-#     volumeBindingMode: WaitForFirstConsumer
-#     allowVolumeExpansion: true
-#     reclaimPolicy: Delete
-#     storagePool: default
-#     copyOnWrite: true
-#     freezeFs: false
+storageClasses:
+  - name: rawfile-localpv
+    enabled: true
+    isDefault: true
+    volumeBindingMode: WaitForFirstConsumer
+    allowVolumeExpansion: true
+    reclaimPolicy: Delete
+    storagePool: default
+    copyOnWrite: true
+    freezeFs: false
