@@ -46,7 +46,7 @@ provisioning:
 ---
 apiVersion: v1alpha1
 kind: UserVolumeConfig
-name: local-path-provisioner
+name: local-storage
 volumeType: partition
 provisioning:
   diskSelector:

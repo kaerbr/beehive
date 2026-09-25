@@ -2,10 +2,10 @@ analytics:
   enabled: false
 
 node:
-  metadataDirPath: /var/mnt/rawfile-meta
+  metadataDirPath: /var/mnt/local-storage/openebs-rawfile-meta
   storagePools:
     default:
-      path: /var/mnt/rawfile
+      path: /var/mnt/local-storage/openebs-rawfile
   snapshotController:
     enabled: false # kommt aus infrastructure/crd/external-snapshotter
 
