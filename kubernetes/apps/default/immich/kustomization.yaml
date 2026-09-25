@@ -1,3 +1,4 @@
 resources:
   - app.yaml
   - configmap.yaml
+  - volsync.yaml

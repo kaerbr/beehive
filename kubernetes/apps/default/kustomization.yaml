@@ -3,7 +3,7 @@ resources:
   - ./podinfo
   - ./paperless-ngx
   - ./miniserve
-  - ./webchanges
+  # - ./webchanges
   - ./immich
   - ./omni-tools
   # - ./local-ai

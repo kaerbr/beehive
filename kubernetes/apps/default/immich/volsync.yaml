@@ -1,0 +1,17 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: volsync-immich-library
+spec:
+  interval: 1h
+  path: ./kubernetes/templates/volsync
+  prune: true
+  targetNamespace: default
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  postBuild:
+    substitute:
+      PVC: immich-library
+      VOLSYNC_CAPACITY: 25Gi

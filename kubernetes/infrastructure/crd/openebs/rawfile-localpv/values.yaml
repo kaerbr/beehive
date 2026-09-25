@@ -2,10 +2,10 @@ analytics:
   enabled: false
 
 node:
-  metadataDirPath: /var/mnt/local-path-provisioner/rawfile-meta
+  metadataDirPath: /var/mnt/rawfile-meta
   storagePools:
     default:
-      path: /var/mnt/local-path-provisioner/rawfile
+      path: /var/mnt/rawfile
   snapshotController:
     enabled: false # kommt aus infrastructure/crd/external-snapshotter
 
