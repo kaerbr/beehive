@@ -94,24 +94,25 @@ spec:
         type: cronjob
         cronjob:
           schedule: "@hourly"
+          concurrencyPolicy: Forbid
         containers:
           filen-sync:
             image:
-              repository: ghcr.io/kaerbr/shipyard/filen-cli
-              tag: 0.0.36
+              repository: rclone/rclone
+              tag: 1.75.1
             args:
               - sync
-              - /external/photos:cloudToLocal:/Bilder
+              - filen:Bilder
+              - /external/photos
               - --verbose
+            env:
+              RCLONE_CONFIG: /config/rclone/rclone.conf
             resources:
               requests:
                 cpu: 50m
                 memory: 128Mi
               limits:
                 memory: 8Gi
-            envFrom:
-              - secretRef:
-                  name: filen-cli
 
     # 2. Service/Ingress
     service:
@@ -145,6 +146,15 @@ spec:
 
     # 3. Persistence (Storage)
     persistence:
+      rclone-config:
+        type: secret
+        name: rclone-filen
+        advancedMounts:
+          sync:
+            filen-sync:
+              - path: /config/rclone
+                readOnly: true
+
       config:
         type: configMap
         identifier: config
