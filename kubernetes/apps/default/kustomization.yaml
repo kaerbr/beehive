@@ -9,3 +9,4 @@ resources:
   # - ./local-ai
   - beehive.lan64.de.ingress.yaml
   - app-template.ocirepository.yaml
+  - rclone-filen.secret.sops.yaml

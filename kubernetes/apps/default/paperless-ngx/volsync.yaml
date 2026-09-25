@@ -1,0 +1,35 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: volsync-paperless-ngx-data
+spec:
+  interval: 1h
+  path: ./kubernetes/templates/volsync
+  prune: true
+  targetNamespace: default
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  postBuild:
+    substitute:
+      PVC: paperless-ngx-data
+      VOLSYNC_CAPACITY: 5Gi
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: volsync-paperless-ngx-media
+spec:
+  interval: 1h
+  path: ./kubernetes/templates/volsync
+  prune: true
+  targetNamespace: default
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  postBuild:
+    substitute:
+      PVC: paperless-ngx-media
+      VOLSYNC_CAPACITY: 10Gi

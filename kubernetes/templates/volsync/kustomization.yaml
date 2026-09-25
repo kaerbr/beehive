@@ -1,0 +1,5 @@
+# Vorlage für eine Flux-Kustomization pro PVC (postBuild.substitute: PVC, VOLSYNC_CAPACITY).
+# Das PVC selbst bleibt in der App und verweist per dataSourceRef auf die ReplicationDestination ${PVC}.
+resources:
+  - replicationsource.yaml
+  - replicationdestination.yaml

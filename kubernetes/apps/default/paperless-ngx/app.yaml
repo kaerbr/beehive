@@ -1,0 +1,134 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: paperless-ngx
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: app-template
+  interval: 24h
+  values:
+    controllers:
+      main:
+        pod:
+          securityContext: # rootless, siehe paperless docs "Rootless"; passt zum VolSync-Mover (1000)
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+            fsGroupChangePolicy: OnRootMismatch
+            seccompProfile:
+              type: RuntimeDefault
+        containers:
+          app:
+            image:
+              repository: ghcr.io/paperless-ngx/paperless-ngx
+              tag: 3.2.1
+            env:
+              PAPERLESS_URL: https://paperless-ngx.beehive.lan64.de
+              PAPERLESS_TIME_ZONE: Europe/Berlin
+              PAPERLESS_OCR_LANGUAGE: deu
+              # app-template rendert env per tpl, daher als Raw-String maskiert
+              PAPERLESS_FILENAME_FORMAT: "{{`{{ created_year }}/{{ created_month }}/{{ correspondent }}/{{ title }}`}}"
+              PAPERLESS_SECRET_KEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: paperless-ngx
+                    key: PAPERLESS_SECRET_KEY
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop: ["ALL"]
+            resources:
+              requests:
+                cpu: 10m
+                memory: 4Gi
+              limits:
+                memory: 4Gi
+
+          redis:
+            image:
+              repository: redis
+              tag: 8.10.1-alpine
+            resources:
+              requests:
+                cpu: 10m
+                memory: 100Mi
+              limits:
+                memory: 100Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop: ["ALL"]
+
+    service:
+      app:
+        controller: main
+        ports:
+          http:
+            port: 8000
+
+    ingress:
+      app:
+        className: traefik
+        hosts:
+          - host: paperless-ngx.beehive.lan64.de
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: http
+
+    persistence:
+      data:
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 5Gi
+        dataSourceRef:
+          kind: ReplicationDestination
+          apiGroup: volsync.backube
+          name: paperless-ngx-data
+        advancedMounts:
+          main:
+            app:
+              - path: /usr/src/paperless/data
+
+      media:
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 10Gi
+        dataSourceRef:
+          kind: ReplicationDestination
+          apiGroup: volsync.backube
+          name: paperless-ngx-media
+        advancedMounts:
+          main:
+            app:
+              - path: /usr/src/paperless/media
+
+      consume:
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 1Gi
+        advancedMounts:
+          main:
+            app:
+              - path: /usr/src/paperless/consume
+
+      backup:
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 1Gi
+        advancedMounts:
+          main:
+            app:
+              - path: /backup
+
+      redis:
+        type: emptyDir
+        advancedMounts:
+          main:
+            redis:
+              - path: /data

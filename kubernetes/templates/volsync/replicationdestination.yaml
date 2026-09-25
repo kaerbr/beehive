@@ -1,0 +1,22 @@
+# Befüllt das PVC (dataSourceRef) beim Erstellen mit dem letzten Backup.
+apiVersion: volsync.backube/v1alpha1
+kind: ReplicationDestination
+metadata:
+  name: ${PVC}
+spec:
+  trigger:
+    manual: restore-once
+  rclone:
+    rcloneConfig: ${VOLSYNC_RCLONE_CONFIG:=rclone-filen}
+    rcloneConfigSection: ${VOLSYNC_RCLONE_CONFIG_SECTION:=filen}
+    rcloneDestPath: Backups/beehive/volsync/${PVC}
+    copyMethod: ${VOLSYNC_COPY_METHOD:=Snapshot}
+    capacity: ${VOLSYNC_CAPACITY}
+    accessModes: ["${VOLSYNC_ACCESS_MODES:=ReadWriteOnce}"]
+    storageClassName: ${VOLSYNC_STORAGECLASS:=rawfile-localpv}
+    cleanupTempPVC: True
+    moverSecurityContext:
+      runAsUser: ${VOLSYNC_PUID:=1000}
+      runAsGroup: ${VOLSYNC_PGID:=1000}
+      fsGroup: ${VOLSYNC_PGID:=1000}
+      fsGroupChangePolicy: OnRootMismatch
