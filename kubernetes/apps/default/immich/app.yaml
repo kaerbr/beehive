@@ -11,7 +11,9 @@ spec:
   interval: 24h
   values:
     controllers:
-      db:
+      # Server, Machine Learning, Postgres und Valkey in einem Pod (Kommunikation über localhost)
+      server:
+        forceRename: immich
         replicas: 1
         containers:
           database:
@@ -58,16 +60,13 @@ spec:
                       - redis-cli
                       - ping
 
-      server:
-        replicas: 1
-        containers:
           server:
             image:
               repository: ghcr.io/immich-app/immich-server
               tag: v3.2.2
             env:
-              REDIS_HOSTNAME: immich-db
-              DB_HOSTNAME: immich-db
+              REDIS_HOSTNAME: localhost
+              DB_HOSTNAME: localhost
               DB_USERNAME: *dbUser
               DB_DATABASE_NAME: *dbName
               DB_PASSWORD: *dbPassword
@@ -121,13 +120,6 @@ spec:
         ports:
           http:
             port: 2283
-      db:
-        controller: db
-        ports:
-          postgres:
-            port: 5432
-          redis:
-            port: 6379
 
     ingress:
       server:
@@ -140,11 +132,22 @@ spec:
                   identifier: server
                   port: http
 
+    configMaps:
+      config:
+        data:
+          # ML läuft im selben Pod, Standard wäre http://immich-machine-learning:3003
+          immich.json: |
+            {
+              "machineLearning": {
+                "urls": ["http://localhost:3003"]
+              }
+            }
+
     # 3. Persistence (Storage)
     persistence:
       config:
         type: configMap
-        name: immich-config
+        identifier: config
         advancedMounts:
           server:
             server:
@@ -191,7 +194,7 @@ spec:
         size: 5Gi
         retain: true
         advancedMounts:
-          db:
+          server:
             database:
               - path: /var/lib/postgresql/data
 
