@@ -9,3 +9,22 @@ resources:
   # - ./local-ai
   - app-template.ocirepository.yaml
   - rclone-filen.secret.sops.yaml
+
+# Für alle HelmReleases: Installs dürfen länger dauern (PVC-Restore über VolSync)
+# und werden bei Fehlschlag bis zu 3x wiederholt (danach bleibt der Fehler sichtbar stehen).
+patches:
+  - target:
+      kind: HelmRelease
+    patch: |
+      apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      metadata:
+        name: all
+      spec:
+        install:
+          timeout: 30m
+          remediation:
+            retries: 3
+        upgrade:
+          remediation:
+            retries: 3

@@ -4,6 +4,7 @@ metadata:
   name: volsync-paperless-ngx-data
 spec:
   interval: 1h
+  retryInterval: 5m
   path: ./kubernetes/templates/volsync
   prune: true
   targetNamespace: default
@@ -22,6 +23,7 @@ metadata:
   name: volsync-paperless-ngx-media
 spec:
   interval: 1h
+  retryInterval: 5m
   path: ./kubernetes/templates/volsync
   prune: true
   targetNamespace: default
