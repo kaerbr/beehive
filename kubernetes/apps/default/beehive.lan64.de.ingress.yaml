@@ -1,47 +1,20 @@
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: beehive
-spec:
-  ingressClassName: traefik
-  rules:
-    # - host: podinfo.beehive.lan64.de
-    #   http:
-    #     paths:
-    #       - path: /
-    #         pathType: Prefix
-    #         backend:
-    #           service:
-    #             name: podinfo
-    #             port:
-    #               name: http
-    - host: paperless-ngx.beehive.lan64.de
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: paperless-ngx
-                port:
-                  name: http
-    - host: paperless-ai.beehive.lan64.de
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: paperless-ai
-                port:
-                  name: http
-    - host: miniserve.beehive.lan64.de
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: miniserve
-                port:
-                  name: http
+# Ingress is mostly managed via the app template bjw-s
+# I will let this file sit here to know how to do it for the future
+
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: beehive
+# spec:
+#   ingressClassName: traefik
+#   rules:
+#     - host: podinfo.beehive.lan64.de
+#       http:
+#         paths:
+#           - path: /
+#             pathType: Prefix
+#             backend:
+#               service:
+#                 name: podinfo
+#                 port:
+#                   name: http

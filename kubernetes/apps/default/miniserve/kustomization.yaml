@@ -1,4 +1,2 @@
 resources:
-  - ./pvc/nas.pvc.yaml
-  - deployment.yaml
-  - service.yaml
+  - app.yaml
