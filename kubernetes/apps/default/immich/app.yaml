@@ -25,6 +25,8 @@ spec:
               POSTGRES_DB: &dbName immich
               POSTGRES_PASSWORD: &dbPassword Immich123!()
               POSTGRES_INITDB_ARGS: --data-checksums
+              # Unterordner, weil ext4 (rawfile) im Mount-Root lost+found anlegt und initdb dann abbricht
+              PGDATA: /var/lib/postgresql/data/pgdata
             resources:
               requests:
                 cpu: 100m
