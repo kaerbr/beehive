@@ -45,7 +45,7 @@ spec:
               limits:
                 memory: 2Gi
 
-          redis:
+          valkey:
             image:
               repository: docker.io/valkey/valkey
               tag: 9.1.2-alpine
@@ -56,13 +56,13 @@ spec:
               limits:
                 memory: 2Gi
             probes:
-              readiness: &redisProbe
+              readiness: &valkeyProbe
                 enabled: true
                 custom: true
                 spec:
                   exec:
                     command: ["sh", "-c", "redis-cli ping | grep -q PONG"]
-              liveness: *redisProbe
+              liveness: *valkeyProbe
 
           server:
             image:

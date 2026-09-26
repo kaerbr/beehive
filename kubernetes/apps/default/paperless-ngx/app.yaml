@@ -81,18 +81,18 @@ spec:
               limits:
                 memory: 4Gi
 
-          redis:
+          valkey:
             image:
-              repository: redis
-              tag: 8.10.1-alpine
+              repository: docker.io/valkey/valkey
+              tag: 9.1.2-alpine
             probes:
-              readiness: &redisProbe
+              readiness: &valkeyProbe
                 enabled: true
                 custom: true
                 spec:
                   exec:
                     command: ["sh", "-c", "redis-cli ping | grep -q PONG"]
-              liveness: *redisProbe
+              liveness: *valkeyProbe
             resources:
               requests:
                 cpu: 10m
@@ -167,9 +167,9 @@ spec:
             app:
               - path: /backup
 
-      redis:
+      valkey:
         type: emptyDir
         advancedMounts:
           main:
-            redis:
+            valkey:
               - path: /data
