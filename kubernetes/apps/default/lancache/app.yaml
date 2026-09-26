@@ -1,0 +1,85 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: lancache
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: app-template
+  interval: 24h
+  values:
+    controllers:
+      main:
+        pod:
+          automountServiceAccountToken: false
+        containers:
+          app:
+            image:
+              repository: docker.io/lancachenet/monolithic
+              tag: latest # es gibt keine Versions-Tags, daher per Digest gepinnt
+              digest: sha256:37f28b362c939a333f3e4f12aa8ca80604cf75050b2f190d0ad972b2fedce00e
+            env:
+              CACHE_DISK_SIZE: 150g # muss kleiner als das PVC cache sein
+              UPSTREAM_DNS: 9.9.9.9
+              TZ: Europe/Berlin
+            # wie der HEALTHCHECK im Image
+            probes:
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet: &lancacheHttp { path: /lancache-heartbeat, port: 80 }
+                  periodSeconds: 10
+                  failureThreshold: 12
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet: *lancacheHttp
+                  periodSeconds: 30
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet: *lancacheHttp
+                  periodSeconds: 60
+                  failureThreshold: 3
+            resources:
+              requests:
+                cpu: 10m
+                memory: 2Gi
+                ephemeral-storage: 1Gi
+              limits:
+                memory: 2Gi
+                ephemeral-storage: 10Gi
+
+    service:
+      app:
+        controller: main
+        type: LoadBalancer
+        annotations:
+          metallb.io/loadBalancerIPs: "192.168.178.102, fd00::102"
+        ipFamilyPolicy: PreferDualStack
+        ipFamilies:
+          - IPv4
+          - IPv6
+        ports:
+          http:
+            port: 80
+          https:
+            port: 443
+
+    persistence:
+      cache:
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 150Gi
+        globalMounts:
+          - path: /data/cache
+      # Logs müssen einen Neustart nicht überleben
+      logs:
+        type: emptyDir
+        globalMounts:
+          - path: /data/logs
