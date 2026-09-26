@@ -20,6 +20,14 @@ spec:
               tag: 6.15.0
             env:
               PODINFO_UI_COLOR: "#70044e"
+            probes:
+              readiness: &probe
+                enabled: true
+                custom: true
+                spec:
+                  httpGet: { path: /readyz, port: 9898 }
+                  periodSeconds: 10
+              liveness: *probe
             resources:
               requests:
                 cpu: 10m

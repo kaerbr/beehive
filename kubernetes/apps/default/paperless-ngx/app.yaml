@@ -39,26 +39,37 @@ spec:
                     key: PAPERLESS_SECRET_KEY
             # wie der HEALTHCHECK im paperless-Image; Host localhost ist in ALLOWED_HOSTS immer erlaubt
             probes:
-              startup: # erster Start inkl. DB-Migrationen kann dauern (bis 10 min)
+              # erster Start inkl. DB-Migrationen kann dauern (bis 10 min)
+              startup:
                 enabled: true
                 custom: true
                 spec:
-                  httpGet: &probe
+                  httpGet: &paperlessngxHttp
                     path: /accounts/login/
                     port: 8000
                     httpHeaders:
                       - name: Host
                         value: localhost
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 60
+              # großzügige Timeouts: die Login-Seite kann während OCR langsam sein
               readiness:
                 enabled: true
                 custom: true
                 spec:
-                  httpGet: *probe
+                  httpGet: *paperlessngxHttp
+                  periodSeconds: 30
+                  timeoutSeconds: 10
+                  failureThreshold: 3
               liveness:
                 enabled: true
                 custom: true
                 spec:
-                  httpGet: *probe
+                  httpGet: *paperlessngxHttp
+                  periodSeconds: 30
+                  timeoutSeconds: 10
+                  failureThreshold: 5
             securityContext:
               allowPrivilegeEscalation: false
               capabilities:
@@ -74,6 +85,14 @@ spec:
             image:
               repository: redis
               tag: 8.10.1-alpine
+            probes:
+              readiness: &redisProbe
+                enabled: true
+                custom: true
+                spec:
+                  exec:
+                    command: ["sh", "-c", "redis-cli ping | grep -q PONG"]
+              liveness: *redisProbe
             resources:
               requests:
                 cpu: 10m

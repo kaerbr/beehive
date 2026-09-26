@@ -27,6 +27,17 @@ spec:
               POSTGRES_INITDB_ARGS: --data-checksums
               # Unterordner, weil ext4 (rawfile) im Mount-Root lost+found anlegt und initdb dann abbricht
               PGDATA: /var/lib/postgresql/data/pgdata
+            # pg_isready wie healthcheck.sh im Image; dessen Checksummen-Prüfung bewusst nicht,
+            # ein Neustart repariert keine beschädigten Seiten
+            probes:
+              readiness: &pgProbe
+                enabled: true
+                custom: true
+                spec:
+                  exec:
+                    command: ["pg_isready", "-U", *dbUser, "-d", *dbName]
+                  periodSeconds: 10
+              liveness: *pgProbe
             resources:
               requests:
                 cpu: 100m
@@ -45,22 +56,13 @@ spec:
               limits:
                 memory: 2Gi
             probes:
-              readiness:
+              readiness: &redisProbe
                 enabled: true
                 custom: true
                 spec:
                   exec:
-                    command:
-                      - redis-cli
-                      - ping
-              liveness:
-                enabled: true
-                custom: true
-                spec:
-                  exec:
-                    command:
-                      - redis-cli
-                      - ping
+                    command: ["sh", "-c", "redis-cli ping | grep -q PONG"]
+              liveness: *redisProbe
 
           server:
             image:
@@ -74,6 +76,31 @@ spec:
               DB_PASSWORD: *dbPassword
               TZ: Europe/Berlin
               IMMICH_CONFIG_FILE: /config/immich.json
+            # wie server/bin/immich-healthcheck; startup lässt Zeit für DB-Migrationen (bis 10 min)
+            probes:
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet: &immichHttp { path: /api/server/ping, port: 2283 }
+                  periodSeconds: 10
+                  failureThreshold: 60
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet: *immichHttp
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 3
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet: *immichHttp
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 5
             resources:
               requests:
                 cpu: 100m
@@ -85,6 +112,28 @@ spec:
             image:
               repository: ghcr.io/immich-app/immich-machine-learning
               tag: v3.2.2
+            # wie scripts/healthcheck.py im ML-Image
+            probes:
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet: { path: /ping, port: 3003 }
+                  periodSeconds: 10
+                  failureThreshold: 30
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet: { path: /ping, port: 3003 }
+                  periodSeconds: 10
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet: { path: /ping, port: 3003 }
+                  periodSeconds: 30
+                  failureThreshold: 5
             resources:
               requests:
                 cpu: 100m

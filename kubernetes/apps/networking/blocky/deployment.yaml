@@ -35,6 +35,14 @@ spec:
                 - healthcheck
             initialDelaySeconds: 15
             periodSeconds: 10
+          livenessProbe: # HEALTHCHECK im Image: start-period 1m
+            exec:
+              command:
+                - /app/blocky
+                - healthcheck
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            failureThreshold: 3
           volumeMounts:
             - name: blocky-config
               mountPath: /app/config.yml

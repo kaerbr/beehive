@@ -36,6 +36,14 @@ spec:
               - rename
               - --port
               - "8080"
+            # eigene Healthcheck-Route von miniserve (schneller als die Dateiliste unter /)
+            probes:
+              readiness:  &probe
+                enabled: true
+                custom: true
+                spec:
+                  httpGet: { path: /__miniserve_internal/healthcheck, port: 8080 }
+              liveness: *probe
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
