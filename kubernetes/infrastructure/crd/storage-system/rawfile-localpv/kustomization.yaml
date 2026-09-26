@@ -1,6 +1,4 @@
-namespace: openebs
 resources:
-  - namespace.yaml
   - helm.yaml
 configMapGenerator:
   - name: rawfile-localpv-helm-values

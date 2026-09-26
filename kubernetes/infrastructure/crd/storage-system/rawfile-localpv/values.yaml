@@ -7,7 +7,7 @@ node:
     default:
       path: /var/mnt/local-storage/openebs-rawfile
   snapshotController:
-    enabled: false # kommt aus infrastructure/crd/external-snapshotter
+    enabled: false # kommt aus infrastructure/crd/storage-system/external-snapshotter
 
 # workaround für bug in helm chart
 snapshotClasses: []

@@ -1,0 +1,7 @@
+# Alles rund um Storage: CSI-Treiber, Snapshots, Backups
+namespace: storage-system
+resources:
+  - namespace.yaml
+  - ./external-snapshotter
+  - ./rawfile-localpv
+  - ./volsync

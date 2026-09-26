@@ -1,4 +1,0 @@
-namespace: volsync-system
-resources:
-  - namespace.yaml
-  - helm.yaml
