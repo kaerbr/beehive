@@ -37,6 +37,28 @@ spec:
                   secretKeyRef:
                     name: paperless-ngx
                     key: PAPERLESS_SECRET_KEY
+            # wie der HEALTHCHECK im paperless-Image; Host localhost ist in ALLOWED_HOSTS immer erlaubt
+            probes:
+              startup: # erster Start inkl. DB-Migrationen kann dauern (bis 10 min)
+                enabled: true
+                custom: true
+                spec:
+                  httpGet: &probe
+                    path: /accounts/login/
+                    port: 8000
+                    httpHeaders:
+                      - name: Host
+                        value: localhost
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet: *probe
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet: *probe
             securityContext:
               allowPrivilegeEscalation: false
               capabilities:
