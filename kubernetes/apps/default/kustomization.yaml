@@ -4,7 +4,7 @@ resources:
   - ./paperless-ngx
   - ./miniserve
   # - ./webchanges
-  - ./immich
+  # - ./immich
   - ./omni-tools
   # - ./local-ai
   - app-template.ocirepository.yaml
