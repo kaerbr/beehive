@@ -216,11 +216,12 @@ spec:
                 readOnly: true
 
       # The main Immich upload folder (Internal) - Only for Server
-      # Enthält auch die täglichen DB-Dumps (/data/backups); Backup/Restore über volsync.yaml
+      # Enthält v.a. die täglichen DB-Dumps (/data/backups); Backup/Restore über volsync.yaml.
+      # Größe muss zu VOLSYNC_CAPACITY in volsync.yaml passen (PVC aus Snapshot)
       library:
         type: persistentVolumeClaim
         accessMode: ReadWriteOnce
-        size: 25Gi
+        size: 2Gi
         dataSourceRef:
           kind: ReplicationDestination
           apiGroup: volsync.backube
@@ -230,12 +231,24 @@ spec:
             server:
               - path: /data
 
+      # Miniaturansichten und umgewandelte Videos: jederzeit neu erzeugbar, daher eigenes PVC ohne VolSync-Backup.
+      generated:
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 20Gi
+        advancedMounts:
+          server:
+            server:
+              - path: /data/thumbs
+                subPath: thumbs
+              - path: /data/encoded-video
+                subPath: encoded-video
+
       # YOUR EXTERNAL LIBRARY - Only for Server (and ML if you want OCR on external files)
       external:
         type: persistentVolumeClaim
         accessMode: ReadWriteOnce
         size: 75Gi
-        retain: true
         advancedMounts:
           server:
             server:
@@ -253,7 +266,6 @@ spec:
         type: persistentVolumeClaim
         accessMode: ReadWriteOnce
         size: 5Gi
-        retain: true
         advancedMounts:
           server:
             database:

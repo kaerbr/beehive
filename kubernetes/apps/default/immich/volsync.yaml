@@ -15,4 +15,4 @@ spec:
   postBuild:
     substitute:
       PVC: immich-library
-      VOLSYNC_CAPACITY: 25Gi
+      VOLSYNC_CAPACITY: 2Gi # muss zu size von library in app.yaml passen
