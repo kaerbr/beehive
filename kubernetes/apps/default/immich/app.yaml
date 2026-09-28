@@ -112,6 +112,9 @@ spec:
             image:
               repository: ghcr.io/immich-app/immich-machine-learning
               tag: v3.2.2
+            env:
+              MACHINE_LEARNING_MODEL_TTL: "0"
+              MACHINE_LEARNING_PRELOAD__CLIP__TEXTUAL: nllb-clip-base-siglip__v1
             # wie scripts/healthcheck.py im ML-Image
             probes:
               startup:
@@ -139,7 +142,7 @@ spec:
                 cpu: 100m
                 memory: 250Mi
               limits:
-                memory: 2Gi
+                memory: 4Gi
 
       sync:
         type: cronjob
@@ -191,7 +194,10 @@ spec:
           immich.json: |
             {
               "machineLearning": {
-                "urls": ["http://localhost:3003"]
+                "urls": ["http://localhost:3003"],
+                "clip": {
+                  "modelName": "nllb-clip-base-siglip__v1"
+                }
               }
             }
 
@@ -273,7 +279,9 @@ spec:
 
       # Machine Learning Model Cache - Only for Machine Learning
       model-cache:
-        type: emptyDir
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 5Gi
         advancedMounts:
           server:
             machine-learning:
