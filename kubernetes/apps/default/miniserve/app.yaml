@@ -75,6 +75,11 @@ spec:
                   port: http
 
     persistence:
+      tmp:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp
+
       nas:
         type: persistentVolumeClaim
         accessMode: ReadWriteOnce
