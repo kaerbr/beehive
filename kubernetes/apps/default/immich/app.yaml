@@ -67,7 +67,7 @@ spec:
           server:
             image:
               repository: ghcr.io/immich-app/immich-server
-              tag: v3.2.4
+              tag: v3.3.1
             env:
               REDIS_HOSTNAME: localhost
               DB_HOSTNAME: localhost
@@ -111,7 +111,7 @@ spec:
           machine-learning:
             image:
               repository: ghcr.io/immich-app/immich-machine-learning
-              tag: v3.2.4
+              tag: v3.3.1
             env:
               MACHINE_LEARNING_MODEL_TTL: "0"
               MACHINE_LEARNING_PRELOAD__CLIP__TEXTUAL: nllb-clip-base-siglip__v1
