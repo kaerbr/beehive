@@ -114,7 +114,7 @@ spec:
               tag: v3.3.1
             env:
               MACHINE_LEARNING_MODEL_TTL: "0"
-              MACHINE_LEARNING_PRELOAD__CLIP__TEXTUAL: nllb-clip-base-siglip__v1
+              MACHINE_LEARNING_PRELOAD__CLIP__TEXTUAL: ViT-B-16-SigLIP2__webli
             # wie scripts/healthcheck.py im ML-Image
             probes:
               startup:
@@ -196,7 +196,7 @@ spec:
               "machineLearning": {
                 "urls": ["http://localhost:3003"],
                 "clip": {
-                  "modelName": "nllb-clip-base-siglip__v1"
+                  "modelName": "ViT-B-16-SigLIP2__webli"
                 }
               }
             }
@@ -278,10 +278,11 @@ spec:
               - path: /var/lib/postgresql/data
 
       # Machine Learning Model Cache - Only for Machine Learning
+      # ViT-B-16-SigLIP2__webli (mehrsprachig) ist groß und wird beim Laden zusätzlich als vorbereitete Kopie abgelegt
       model-cache:
         type: persistentVolumeClaim
         accessMode: ReadWriteOnce
-        size: 5Gi
+        size: 10Gi
         advancedMounts:
           server:
             machine-learning:
