@@ -153,7 +153,7 @@ spec:
           filen-sync:
             image:
               repository: rclone/rclone
-              tag: 1.75.1
+              tag: 1.75.2
             args:
               - sync
               - filen:Bilder
