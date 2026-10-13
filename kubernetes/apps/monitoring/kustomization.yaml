@@ -1,5 +1,5 @@
 namespace: monitoring
+# Namespace und Operator-CRDs liegen in infrastructure/crd/monitoring
 resources:
-  - namespace.yaml
-  # - ./kube-prometheus-stack
+  - ./victoria-metrics-k8s-stack
   # - ./speedtest-exporter

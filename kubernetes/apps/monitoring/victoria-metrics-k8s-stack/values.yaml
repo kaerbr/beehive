@@ -1,0 +1,99 @@
+# Schlank für einen einzelnen Low-Power-Node: vmsingle + vmagent + Grafana
+
+victoria-metrics-operator:
+  # Standardname ist zu lang: der Job des Cleanup-Hooks (Uninstall) wird bei > 63 Zeichen abgelehnt
+  fullnameOverride: vm-operator
+  crds:
+    enabled: false # kommen aus infrastructure/crd/monitoring
+    plain: false # vom Chart verlangt, wenn enabled: false
+
+vmsingle:
+  spec:
+    retentionPeriod: 30d # kostet kaum CPU, VictoriaMetrics komprimiert stark
+    storage:
+      resources:
+        requests:
+          storage: 5Gi
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        memory: 1Gi # bewusst kein CPU-Limit, das würde nur drosseln
+
+vmagent:
+  spec:
+    scrapeInterval: 60s # Standard 20s; ein Drittel der Abfragen
+    # Histogramme mit sehr vielen Zeitreihen verwerfen, bevor sie gespeichert werden.
+    # Folge: Latenz-Panels im API-Server-Dashboard bleiben leer.
+    inlineRelabelConfig:
+      - sourceLabels: [__name__]
+        regex: (apiserver_request_duration_seconds|apiserver_request_sli_duration_seconds|etcd_request_duration_seconds)_bucket
+        action: drop
+
+# Ohne Empfänger konfiguriert, daher vorerst aus (vmalert braucht einen Notifier)
+alertmanager:
+  enabled: false
+vmalert:
+  enabled: false
+# Alarmregeln (VMRules) nur sinnvoll mit vmalert
+defaultRules:
+  enabled: false
+
+# Vom Chart nur drei Dashboards: Host (Node Exporter Full), Cluster (Views/Global), Pods (Views/Pods).
+# Dashboards einzelner Services liegen als ConfigMaps bei den Services
+# (infrastructure/config/<service> bzw. apps/<namespace>/<app>).
+# Quellen ausgeschalteter Komponenten (etcd, vmalert, ...) schaltet der Chart selbst ab.
+defaultDashboards:
+  sources:
+    kube-prometheus: # 33 Dashboards, alle fest auf UTC
+      enabled: false
+    kubernetes-views-namespaces:
+      enabled: false
+    kubernetes-views-nodes:
+      enabled: false
+    kubernetes-system-api-server:
+      enabled: false
+    kubernetes-system-coredns:
+      enabled: false
+    victoriametrics-single-node:
+      enabled: false
+    victoriametrics-vmagent:
+      enabled: false
+    victoriametrics-operator:
+      enabled: false
+
+grafana:
+  sidecar:
+    dashboards:
+      searchNamespace: ALL # Dashboards liegen als ConfigMaps bei den jeweiligen Services
+  # admin:
+  #   existingSecret: grafana-credentials
+  #   userKey: admin-user
+  #   passwordKey: admin-password
+  grafana.ini:
+    # date_formats:
+    #   default_timezone: Europe/Berlin # gilt für Dashboards ohne feste Zeitzone
+    analytics:
+      reporting_enabled: false
+      check_for_updates: false
+    # Grafanas eigene Alert-Engine wertet sonst im Hintergrund Regeln aus; wir alarmieren nicht
+    unified_alerting:
+      enabled: false
+    auth.anonymous:
+      enabled: true
+      org_role: Admin   # Viewer, Editor, Admin
+  ingress:
+    enabled: true
+    ingressClassName: traefik
+    hosts:
+      - grafana.beehive.lan64.de
+
+# Talos bindet diese Komponenten an 127.0.0.1 bzw. etcd braucht Client-Zertifikate,
+# von außen nicht abfragbar
+kubeControllerManager:
+  enabled: false
+kubeScheduler:
+  enabled: false
+kubeEtcd:
+  enabled: false
