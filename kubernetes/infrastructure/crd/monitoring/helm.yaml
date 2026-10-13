@@ -1,0 +1,33 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: victoria-metrics
+  namespace: monitoring
+spec:
+  type: oci
+  url: oci://ghcr.io/victoriametrics/helm-charts
+  interval: 6h
+---
+# Nur die Operator-CRDs (VMServiceScrape, VMPodScrape, ...), damit Scrapes in
+# infrastructure/config und apps angelegt werden können. Der Stack selbst liegt in
+# apps/monitoring und kann so nichts blockieren. Version passend zum Operator im Stack halten.
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: victoria-metrics-operator-crds
+  namespace: monitoring
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: victoria-metrics-operator-crds
+      version: 0.15.1
+      sourceRef:
+        kind: HelmRepository
+        name: victoria-metrics
+        namespace: monitoring
+      interval: 6h
+  values:
+    crds:
+      annotations:
+        helm.sh/resource-policy: keep # Entfernen des Releases löscht nie Daten-CRs

@@ -1,0 +1,6 @@
+# Namespace, Helm-Repo und Operator-CRDs für das Monitoring.
+# Der Stack (VictoriaMetrics, VictoriaLogs, Grafana) liegt in apps/monitoring.
+namespace: monitoring
+resources:
+  # - namespace.yaml
+  # - helm.yaml
