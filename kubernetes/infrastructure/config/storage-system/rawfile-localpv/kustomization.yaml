@@ -1,0 +1,13 @@
+namespace: storage-system
+# Grafana-Dashboard für den Füllstand der PVCs (grafana.com 23233 rev 10).
+# https://grafana.com/grafana/dashboards/23233
+# Angepasst: Datenquelle auf VictoriaMetrics, Variable cluster fest auf All (kein cluster-Label)
+configMapGenerator:
+  - name: pvc-dashboard
+    files:
+      - dashboard-pvc.json
+    options:
+      labels:
+        grafana_dashboard: "1"
+generatorOptions:
+  disableNameSuffixHash: true

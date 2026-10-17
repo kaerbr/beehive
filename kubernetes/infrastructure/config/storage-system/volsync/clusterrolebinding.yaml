@@ -1,0 +1,13 @@
+# Erlaubt vmagent den Zugriff auf /metrics von VolSync (ClusterRole aus dem VolSync-Chart)
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: vmagent-volsync-metrics-reader
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: volsync-metrics-reader
+subjects:
+  - kind: ServiceAccount
+    name: vmagent-victoria-metrics-k8s-stack # vom Operator: "vmagent-" + Name des VMAgent
+    namespace: monitoring

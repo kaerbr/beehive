@@ -1,0 +1,15 @@
+# VolSync liefert Metriken per HTTPS und prüft die Berechtigung des Aufrufers
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
+metadata:
+  name: volsync
+spec:
+  selector:
+    matchLabels:
+      control-plane: volsync-controller
+  endpoints:
+    - port: https
+      scheme: https
+      bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+      tlsConfig:
+        insecureSkipVerify: true # selbstsigniertes Zertifikat von VolSync

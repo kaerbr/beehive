@@ -2,3 +2,15 @@ namespace: traefik
 resources:
   - lan64.certificate.yaml
   - tlsstore.yaml
+  - vmpodscrape.yaml
+# Grafana-Dashboard (grafana.com 17347 rev 9, Datenquelle auf VictoriaMetrics gesetzt)
+# https://grafana.com/grafana/dashboards/17347
+configMapGenerator:
+  - name: traefik-dashboard
+    files:
+      - dashboard-traefik.json
+    options:
+      labels:
+        grafana_dashboard: "1"
+generatorOptions:
+  disableNameSuffixHash: true

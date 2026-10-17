@@ -1,3 +1,4 @@
 resources:
   - volumesnapshotclass.yaml
-
+  - ./volsync
+  - ./rawfile-localpv

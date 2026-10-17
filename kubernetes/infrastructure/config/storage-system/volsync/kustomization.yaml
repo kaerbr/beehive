@@ -1,0 +1,16 @@
+namespace: storage-system
+resources:
+  - vmservicescrape.yaml
+  - clusterrolebinding.yaml
+# Grafana-Dashboard (grafana.com 21356 rev 3): https://grafana.com/grafana/dashboards/21356
+# Angepasst: Datenquelle auf VictoriaMetrics,
+# Filter auf role="source" statt auf RD-Namen, CPU ohne Aufzeichnungsregel
+configMapGenerator:
+  - name: volsync-dashboard
+    files:
+      - dashboard-volsync.json
+    options:
+      labels:
+        grafana_dashboard: "1"
+generatorOptions:
+  disableNameSuffixHash: true
