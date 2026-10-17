@@ -1,7 +1,7 @@
 # infrastructure/crd/storage-system/external-snapshotter/kustomization.yaml
 resources:
-  - github.com/kubernetes-csi/external-snapshotter/client/config/crd?ref=v8.6.0
-  - github.com/kubernetes-csi/external-snapshotter/deploy/kubernetes/snapshot-controller?ref=v8.6.0
+  - github.com/kubernetes-csi/external-snapshotter/client/config/crd?ref=v8.7.0
+  - github.com/kubernetes-csi/external-snapshotter/deploy/kubernetes/snapshot-controller?ref=v8.7.0
 patches:
   - target: {kind: Deployment, name: snapshot-controller}
     patch: |-
