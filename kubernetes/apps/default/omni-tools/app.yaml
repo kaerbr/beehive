@@ -17,7 +17,7 @@ spec:
           omni-tools:
             image:
               repository: iib0011/omni-tools
-              tag: 0.6
+              tag: 0.7
             probes:
               readiness: &probe
                 enabled: true
