@@ -51,10 +51,10 @@ spec:
           resources:
             requests:
               cpu: 400m
-              memory: 509Mi
+              memory: 1Gi
               ephemeral-storage: 500Mi
             limits:
-              memory: 509Mi
+              memory: 1Gi
               ephemeral-storage: 1Gi
 #          securityContext:
 #            capabilities:
