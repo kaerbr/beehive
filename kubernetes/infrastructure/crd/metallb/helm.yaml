@@ -23,3 +23,8 @@ spec:
         name: metallb
         namespace: metallb-system
       interval: 6h
+  values:
+    # L2 only, no BGP. The frr-k8s statuscleaner uses hostNetwork port 19443,
+    # so its rolling update deadlocks on a single node.
+    frrk8s:
+      enabled: false
